@@ -1,0 +1,2973 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jogo Estilo Minecraft com Código</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; }
+    #controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 10;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #ff9c08;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: #fff;
+      user-select: none;
+    }
+    #codePanel {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #111;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      box-shadow: 0 0 10px #000;
+    }
+    textarea {
+      width: 300px;
+      height: 120px;
+      font-family: monospace;
+      background: #000;
+      color: white;
+      border: 1px solid #555;
+      padding: 8px;
+    }
+
+
+#control {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none; /* permite clicar nos botões sem bloquear o jogo */
+}
+
+.joystick {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.joystick .vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.acoes {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+#control button {
+  width: 60px;
+  height: 60px;
+  font-size: 20px;
+  border-radius: 10px;
+  background-color: #444;
+  color: white;
+  border: none;
+  box-shadow: 2px 2px 5px #000;
+  cursor: pointer;
+}
+
+  </style>
+</head>
+<body>
+
+
+<!-- Controles estilo joystick -->
+<div id="control">
+  <!-- Direcionais em cruz (lado esquerdo inferior) -->
+  <div class="joystick">
+    <button id="left">⬅️</button>
+    <div class="vertical">
+      <button id="forward">⬆️</button>
+      <button id="backward">⬇️</button>
+    </div>
+    <button id="right">➡️</button>
+  </div>
+
+  <!-- Botões de ação (lado direito inferior) -->
+  <div class="acoes">
+    <button id="jump">⏫ Pular</button>
+    <button id="morph">💪 Transformar</button>
+  </div>
+
+  <!-- Botões de salvar/carregar (você já ajustou) -->
+  <!--
+  <button onclick="exportarMundo()">💾 Salvar Mundo</button>
+  <label for="carregarMundo" style="background:#333; color:white; padding:6px 12px; cursor:pointer;">📂 Carregar Mundo</label>
+  -->
+  <input type="file" id="carregarMundo" accept=".json" style="display:none;" />
+</div>
+
+ 
+  <div id="codePanel">
+    <textarea id="codeInput"> //aperte em executar código para você pode começar a crafitar // área quadrada transparente 
+
+
+// === CONFIGURAÇÃO GLOBAL ===
+const tamanho = 850;  //400
+const altura = 5;
+const espessura = 1;
+
+// === BLOCO DE PAREDE COM REPULSÃO (400x400) ===
+const paredesPerimetro = [
+  { x: 0, y: 0, z: -tamanho / 2, sx: tamanho, sy: altura, sz: espessura }, // frente
+  { x: 0, y: 0, z:  tamanho / 2, sx: tamanho, sy: altura, sz: espessura }, // trás
+  { x: -tamanho / 2, y: 0, z: 0, sx: espessura, sy: altura, sz: tamanho }, // esquerda
+  { x:  tamanho / 2, y: 0, z: 0, sx: espessura, sy: altura, sz: tamanho }  // direita
+];
+
+const blocosParede = [];
+
+for (const p of paredesPerimetro) {
+  const geo = new THREE.BoxGeometry(p.sx, p.sy, p.sz);
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0xff0000,
+    transparent: true,
+    opacity: 0
+  });
+  const cubo = new THREE.Mesh(geo, mat);
+  cubo.position.set(p.x, p.y + p.sy / 2, p.z);
+  world.add(cubo);
+  blocosParede.push({
+    mesh: cubo,
+    x: p.x,
+    y: p.y,
+    z: p.z,
+    sx: p.sx,
+    sy: p.sy,
+    sz: p.sz
+  });
+}
+
+// === REPULSÃO AO TOCAR NAS PAREDES ===
+setInterval(() => {
+  const px = camera.position.x;
+  const py = -world.position.y;
+  const pz = camera.position.z;
+
+  for (const bloco of blocosParede) {
+    const bx = bloco.x + world.position.x;
+    const by = bloco.y;
+    const bz = bloco.z + world.position.z;
+
+    const dx = Math.abs(px - bx);
+    const dy = Math.abs(py - (by + bloco.sy / 2));
+    const dz = Math.abs(pz - bz);
+
+    const limiteX = bloco.sx / 2 + 0.5;
+    const limiteY = bloco.sy + 1;
+    const limiteZ = bloco.sz / 2 + 0.5;
+
+    if (dx < limiteX && dy < limiteY && dz < limiteZ) {
+      empurrarEParar();
+      break;
+    }
+  }
+}, 10);
+
+
+
+
+
+
+
+
+// inventário construí cubos pelo ângulo da visão 
+
+(function () {
+  if (document.getElementById("barraInventario")) return;
+
+  const mapaDeNomes = {
+    "8b4513": "wood",
+    "228b22": "grass",
+    "999900": "pickaxe"
+  };
+
+  const inventario = [];
+
+  // === INVENTÁRIO VISUAL ===
+  const barra = document.createElement("div");
+  barra.id = "barraInventario";
+  barra.style.position = "absolute";
+  barra.style.bottom = "10px";
+  barra.style.left = "50%";
+  barra.style.transform = "translateX(-50%)";
+  barra.style.display = "flex";
+  barra.style.gap = "6px";
+  barra.style.background = "rgba(0,0,0,0.5)";
+  barra.style.padding = "6px 10px";
+  barra.style.borderRadius = "8px";
+  barra.style.zIndex = "1000";
+  document.body.appendChild(barra);
+
+  const style = document.createElement("style");
+  style.textContent = `
+    .slotItem {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #fff;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+    .slotItem.selected {
+      border-color: yellow;
+      box-shadow: 0 0 8px yellow;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // === BOTÃO CRAFTING ===
+  const botao = document.createElement("button");
+  botao.id = "botaoCrafitar";
+  botao.textContent = "🛠️ Crafitar";
+  botao.style.position = "absolute";
+  botao.style.bottom = "70px";
+  botao.style.right = "10px";
+  botao.style.padding = "10px 16px";
+  botao.style.fontSize = "16px";
+  botao.style.background = "#333";
+  botao.style.color = "#fff";
+  botao.style.border = "2px solid #fff";
+  botao.style.borderRadius = "6px";
+  botao.style.cursor = "pointer";
+  botao.style.zIndex = "1000";
+  document.body.appendChild(botao);
+
+  // === FUNÇÃO PARA CRIAR CUBO ===
+  function criarCuboAleatorio(corHex) {
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshStandardMaterial({ color: "#" + corHex });
+    const cubo = new THREE.Mesh(geometry, material);
+
+    // posição: 2 blocos à frente da câmera
+    const dir = new THREE.Vector3();
+    camera.getWorldDirection(dir);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    const pos = camera.position.clone().add(dir.multiplyScalar(2)).floor().addScalar(0.5);
+
+pos.x -= 0;
+pos.y -= 0;
+
+/*
+const mapaObjetos = [
+  [1,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,2],
+  [0,0,0,0,0,0,0,0,0],
+  [3,0,0,0,0,0,0,0,0],
+  [0,0,0,0,4,0,0,0,0],
+  [0,0,0,0,0,0,0,0,4],
+  [0,0,0,0,4,0,0,3,0],
+  [0,0,0,0,0,0,0,2,0],
+  [0,0,0,0,0,0,0,0,4]
+];
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    cubo.position.copy(pos);
+    world.add(cubo);
+    cubes.push(cubo);
+
+    console.log(`🧱 Cubo criado com a cor #${corHex}`);
+  }
+
+  // === ATUALIZA INVENTÁRIO VISUAL ===
+  function atualizarInventario() {
+    const contagem = {};
+    inventario.forEach(cor => {
+      contagem[cor] = (contagem[cor] || 0) + 1;
+    });
+
+    barra.innerHTML = "";
+    Object.entries(contagem).forEach(([cor, qtd]) => {
+      const slot = document.createElement("div");
+      slot.className = "slotItem";
+      slot.style.background = "#" + cor;
+      slot.title = `${cor} (${qtd})`;
+
+      slot.addEventListener("click", () => {
+        const index = inventario.findIndex(c => c === cor);
+        if (index !== -1) {
+          inventario.splice(index, 1);
+          criarCuboAleatorio(cor); // agora cria cubo em vez de vaca
+        }
+        atualizarInventario();
+      });
+
+      barra.appendChild(slot);
+    });
+  }
+
+  // === FUNÇÃO DE CRAFTING ===
+  function encontrarBlocoProximo() {
+    const px = camera.position.x;
+    const py = -world.position.y;
+    const pz = camera.position.z;
+
+    let maisProximo = null;
+    let menorDist = Infinity;
+
+    for (let i = 0; i < cubes.length; i++) {
+      const mesh = cubes[i];
+      const dx = px - (mesh.position.x + world.position.x);
+      const dy = py - mesh.position.y;
+      const dz = pz - (mesh.position.z + world.position.z);
+      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      if (dist < 1.5 && dist < menorDist) {
+        menorDist = dist;
+        maisProximo = mesh;
+      }
+    }
+
+    return maisProximo;
+  }
+
+  function removerBlocosConectados(base) {
+    const visitados = new Set();
+    const fila = [base];
+    const coresRemovidas = [];
+
+    while (fila.length > 0) {
+      const atual = fila.pop();
+      if (!atual || visitados.has(atual.uuid)) continue;
+
+      visitados.add(atual.uuid);
+      const cor = atual.material.color.getHexString().toLowerCase();
+      coresRemovidas.push(cor);
+
+      if (atual.parent) atual.parent.remove(atual);
+      const index = cubes.findIndex(c => c.uuid === atual.uuid);
+      if (index !== -1) cubes.splice(index, 1);
+
+      const vizinhos = cubes.filter(c => {
+        const dx = Math.abs(c.position.x - atual.position.x);
+        const dy = Math.abs(c.position.y - atual.position.y);
+        const dz = Math.abs(c.position.z - atual.position.z);
+        return dx + dy + dz === 1;
+      });
+
+      fila.push(...vizinhos);
+    }
+
+    return coresRemovidas;
+  }
+
+  function crafitarCubo() {
+    const alvo = encontrarBlocoProximo();
+    if (alvo) {
+      const cores = removerBlocosConectados(alvo);
+      inventario.push(...cores);
+      atualizarInventario();
+      alert(`✅ ${cores.length} blocos coletados!`);
+    } else {
+      alert("❌ Nenhum cubo próximo para crafitar.");
+    }
+  }
+
+  botao.addEventListener("click", crafitarCubo);
+/*
+  // === GERADOR DE ÁRVORES ===
+  for (let t = 0; t < 5; t++) {
+    const x = t * 6;
+    const y = 0;
+    const z = 0;
+    const altura = 4;
+
+    for (let i = 0; i < altura; i++) {
+      placeBlock(x, y + i, z, "wood");
+    }
+
+    const topo = y + altura;
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        for (let dy = 0; dy <= 2; dy++) {
+          const distancia = Math.abs(dx) + Math.abs(dz) + dy;
+          if (distancia <= 3) {
+            placeBlock(x + dx, topo + dy, z + dz, "grass");
+          }
+        }
+      }
+    }
+  }*/
+
+  alert("✅ Inventário com criação de cubos ativado!");
+})();
+
+
+/*
+// criar árvores posicionada
+
+// Lista de árvores para controle de visibilidade
+const arvores = [];
+
+// Cria árvore estilo Minecraft com blocos
+function criarArvoreMinecraft(x, z, altura = 4) {
+  const y = 0;
+  const blocos = [];
+
+  // Tronco
+  for (let i = 0; i < altura; i++) {
+    const bloco = placeBlock(x, y + i, z, "wood");
+    blocos.push(bloco);
+  }
+
+  // Copa reduzida
+  const topo = y + altura;
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dz = -1; dz <= 1; dz++) {
+      for (let dy = 0; dy <= 1; dy++) {
+        const distancia = Math.abs(dx) + Math.abs(dz) + dy;
+        if (distancia <= 2) {
+          const bloco = placeBlock(x + dx, topo + dy, z + dz, "grass");
+          blocos.push(bloco);
+        }
+      }
+    }
+  }
+
+  // Armazena referência da árvore como um grupo de blocos
+  arvores.push({ x, z, blocos });
+}
+
+// Gera árvores espalhadas e distantes umas das outras
+function gerarArvoresEspalhadas(qtd = 30, area = 800, minDist = 20) {
+  const geradas = [];
+
+  while (geradas.length < qtd) {
+    const x = Math.floor(Math.random() * area) - area / 2;
+    const z = Math.floor(Math.random() * area) - area / 2;
+
+    // Verifica distância mínima entre árvores
+    const longe = geradas.every(pos => {
+      const dx = pos.x - x;
+      const dz = pos.z - z;
+      return Math.sqrt(dx * dx + dz * dz) >= minDist;
+    });
+
+    if (longe) {
+      criarArvoreMinecraft(x, z);
+      geradas.push({ x, z });
+    }
+  }
+}
+
+// Atualiza visibilidade das árvores com base no campo de visão
+function atualizarVisibilidadeArvores(anguloVisao = Math.PI / 2) {
+  const posCamera = camera.position.clone();
+  const dirCamera = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw)).normalize();
+
+  arvores.forEach(arvore => {
+    const dirParaArvore = new THREE.Vector3(arvore.x, 0, arvore.z).sub(posCamera).setY(0).normalize();
+    const angulo = dirCamera.angleTo(dirParaArvore);
+    const visivel = angulo <= anguloVisao / 2;
+
+    arvore.blocos.forEach(bloco => {
+      if (bloco && bloco.mesh) bloco.mesh.visible = visivel;
+    });
+  });
+}
+
+// Gera as árvores uma vez
+gerarArvoresEspalhadas(19, 600, 40);
+
+// No loop de animação do jogo, adicione:
+function animate() {
+  requestAnimationFrame(animate);
+
+  // ... outros códigos do jogo ...
+
+  atualizarVisibilidadeArvores(Math.PI / 2); // 90° de visão
+
+  renderer.render(scene, camera);
+}
+*/
+
+
+
+
+criarVacaAleatoria()
+criarVacaAleatoria()
+criarVacaAleatoria()
+criarVacaAleatoria()
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+⛏️🛑🛑🛑🛑🛑🔶🔶🔶🔶🔶🔶🛑🛑🛑🛑🛑
+   
+
+⛏️🛑🛑🛑🛑🛑🔶🔶🔶🔶🔶🔶🛑🛑🛑🛑🛑
+//crafitar com prima hexagonal 
+*/
+/*
+// Inventário que constrói prismas hexagonais pelo ângulo 5x5
+
+(function () {
+  if (document.getElementById("barraInventario")) return;
+
+  const mapaDeNomes = {
+    "8b4513": "wood",     // marrom
+    "228b22": "grass",    // verde
+    "999900": "pickaxe"   // amarelo
+  };
+
+  const inventario = [];
+
+  // === INVENTÁRIO VISUAL ===
+  const barra = document.createElement("div");
+  barra.id = "barraInventario";
+  barra.style.position = "absolute";
+  barra.style.bottom = "10px";
+  barra.style.left = "50%";
+  barra.style.transform = "translateX(-50%)";
+  barra.style.display = "flex";
+  barra.style.gap = "6px";
+  barra.style.background = "rgba(0,0,0,0.5)";
+  barra.style.padding = "6px 10px";
+  barra.style.borderRadius = "8px";
+  barra.style.zIndex = "1000";
+  document.body.appendChild(barra);
+
+  const style = document.createElement("style");
+  style.textContent = `
+    .slotItem {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #fff;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+    .slotItem.selected {
+      border-color: yellow;
+      box-shadow: 0 0 8px yellow;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // === BOTÃO CRAFTING ===
+  const botao = document.createElement("button");
+  botao.id = "botaoCrafitar";
+  botao.textContent = "🛠️ Crafitar";
+  botao.style.position = "absolute";
+  botao.style.bottom = "70px";
+  botao.style.right = "10px";
+  botao.style.padding = "10px 16px";
+  botao.style.fontSize = "16px";
+  botao.style.background = "#333";
+  botao.style.color = "#fff";
+  botao.style.border = "2px solid #fff";
+  botao.style.borderRadius = "6px";
+  botao.style.cursor = "pointer";
+  botao.style.zIndex = "1000";
+  document.body.appendChild(botao);
+
+  // === FUNÇÃO PARA CRIAR PRISMA HEXAGONAL ===
+  function criarPrismaHexagonal(corHex) {
+    // Prisma hexagonal
+    const geometry = new THREE.CylinderGeometry(0.5, 0.5, 1, 6);
+    const material = new THREE.MeshStandardMaterial({ color: "#" + corHex });
+    const prisma = new THREE.Mesh(geometry, material);
+
+    // posição: 5 blocos à frente da câmera
+    const dir = new THREE.Vector3();
+    camera.getWorldDirection(dir);
+    const pos = camera.position.clone().add(dir.multiplyScalar(5)).floor().addScalar(0.5);
+
+    prisma.position.copy(pos);
+    world.add(prisma);
+    cubes.push(prisma);
+
+    console.log(`🔷 Prisma hexagonal criado com a cor #${corHex}`);
+  }
+
+  // === ATUALIZA INVENTÁRIO VISUAL ===
+  function atualizarInventario() {
+    const contagem = {};
+    inventario.forEach(cor => {
+      contagem[cor] = (contagem[cor] || 0) + 1;
+    });
+
+    barra.innerHTML = "";
+    Object.entries(contagem).forEach(([cor, qtd]) => {
+      const slot = document.createElement("div");
+      slot.className = "slotItem";
+      slot.style.background = "#" + cor;
+      slot.title = `${cor} (${qtd})`;
+
+      slot.addEventListener("click", () => {
+        const index = inventario.findIndex(c => c === cor);
+        if (index !== -1) {
+          inventario.splice(index, 1);
+          criarPrismaHexagonal(cor); // cria prisma hexagonal
+        }
+        atualizarInventario();
+      });
+
+      barra.appendChild(slot);
+    });
+  }
+
+  // === FUNÇÃO DE CRAFTING ===
+  function encontrarBlocoProximo() {
+    const px = camera.position.x;
+    const py = -world.position.y;
+    const pz = camera.position.z;
+
+    let maisProximo = null;
+    let menorDist = Infinity;
+
+    for (let i = 0; i < cubes.length; i++) {
+      const mesh = cubes[i];
+      const dx = px - (mesh.position.x + world.position.x);
+      const dy = py - mesh.position.y;
+      const dz = pz - (mesh.position.z + world.position.z);
+      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      if (dist < 1.5 && dist < menorDist) {
+        menorDist = dist;
+        maisProximo = mesh;
+      }
+    }
+
+    return maisProximo;
+  }
+
+  function removerBlocosConectados(base) {
+    const visitados = new Set();
+    const fila = [base];
+    const coresRemovidas = [];
+
+    while (fila.length > 0) {
+      const atual = fila.pop();
+      if (!atual || visitados.has(atual.uuid)) continue;
+
+      visitados.add(atual.uuid);
+      const cor = atual.material.color.getHexString().toLowerCase();
+      coresRemovidas.push(cor);
+
+      if (atual.parent) atual.parent.remove(atual);
+      const index = cubes.findIndex(c => c.uuid === atual.uuid);
+      if (index !== -1) cubes.splice(index, 1);
+
+      const vizinhos = cubes.filter(c => {
+        const dx = Math.abs(c.position.x - atual.position.x);
+        const dy = Math.abs(c.position.y - atual.position.y);
+        const dz = Math.abs(c.position.z - atual.position.z);
+        return dx + dy + dz === 1;
+      });
+
+      fila.push(...vizinhos);
+    }
+
+    return coresRemovidas;
+  }
+
+  function crafitarCubo() {
+    const alvo = encontrarBlocoProximo();
+    if (alvo) {
+      const cores = removerBlocosConectados(alvo);
+      inventario.push(...cores);
+      atualizarInventario();
+      alert(`✅ ${cores.length} prismas coletados!`);
+    } else {
+      alert("❌ Nenhum prisma próximo para crafitar.");
+    }
+  }
+
+  botao.addEventListener("click", crafitarCubo);
+
+  // === GERADOR DE ÁRVORES (com prismas hexagonais) ===
+  for (let t = 0; t < 5; t++) {
+    const x = t * 6;
+    const y = 0;
+    const z = 0;
+    const altura = 4;
+
+    // tronco
+    for (let i = 0; i < altura; i++) {
+      criarPrismaHexagonal("8b4513"); // marrom
+    }
+
+    // copa
+    const topo = y + altura;
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        for (let dy = 0; dy <= 2; dy++) {
+          const distancia = Math.abs(dx) + Math.abs(dz) + dy;
+          if (distancia <= 3) {
+            criarPrismaHexagonal("228b22"); // verde
+          }
+        }
+      }
+    }
+  }
+
+  alert("✅ Inventário com criação de prismas hexagonais ativado!");
+})();
+*/
+
+
+
+
+
+
+
+
+
+
+// Criar objetos posicionados no mapa
+
+// === Funções para criar objetos específicos ===
+
+// Cruz (agora marrom)
+function criarCruz(x, z) {
+  const geoVertical = new THREE.BoxGeometry(0.5, 6, 0.5);
+  const mat = new THREE.MeshBasicMaterial({ color: 0x8B4513 }); // marrom
+  const vertical = new THREE.Mesh(geoVertical, mat);
+  vertical.position.set(x, 3, z);
+  world.add(vertical);
+
+  const geoHorizontal = new THREE.BoxGeometry(4, 0.5, 0.5);
+  const horizontal = new THREE.Mesh(geoHorizontal, mat);
+  horizontal.position.set(x, 4, z);
+  world.add(horizontal);
+}
+
+// Poço caipira
+function criarPoco(x, z) {
+  const geoBase = new THREE.CylinderGeometry(3, 3, 2, 16);
+  const matBase = new THREE.MeshBasicMaterial({ color: 0x555555 });
+  const base = new THREE.Mesh(geoBase, matBase);
+  base.position.set(x, 1, z);
+  world.add(base);
+
+  const geoAgua = new THREE.CircleGeometry(2.8, 16);
+  const matAgua = new THREE.MeshBasicMaterial({ color: 0x0000ff }); // azul
+  const agua = new THREE.Mesh(geoAgua, matAgua);
+  agua.rotation.x = -Math.PI / 2;
+  agua.position.set(x, 2.01, z);
+  world.add(agua);
+}
+
+// Árvore caída
+function criarArvoreCaida(x, z) {
+  const troncoGeo = new THREE.CylinderGeometry(0.5, 0.5, 8);
+  const troncoMat = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
+  const tronco = new THREE.Mesh(troncoGeo, troncoMat);
+  tronco.rotation.z = Math.PI / 2;
+  tronco.position.set(x, 0.5, z);
+  world.add(tronco);
+
+  const copaGeo = new THREE.SphereGeometry(2, 8, 8);
+  const copaMat = new THREE.MeshBasicMaterial({ color: 0x228B22 });
+  const copa = new THREE.Mesh(copaGeo, copaMat);
+  copa.position.set(x + 4, 1, z);
+  world.add(copa);
+}
+
+// Árvore em pé
+function criarArvoreEmPe(x, z) {
+  const troncoGeo = new THREE.CylinderGeometry(0.5, 0.5, 6);
+  const troncoMat = new THREE.MeshBasicMaterial({ color: 0x8B4513 }); // marrom
+  const tronco = new THREE.Mesh(troncoGeo, troncoMat);
+  tronco.position.set(x, 3, z);
+  world.add(tronco);
+
+  const copaGeo = new THREE.SphereGeometry(3, 12, 12);
+  const copaMat = new THREE.MeshBasicMaterial({ color: 0x228B22 }); // verde
+  const copa = new THREE.Mesh(copaGeo, copaMat);
+  copa.position.set(x, 8, z);
+  world.add(copa);
+}
+
+// === Função genérica para criar objetos por número ===
+function criarObjetoPorNumero(numero, x, z) {
+  switch (numero) {
+    case 1: // Cruz
+      criarCruz(x, z);
+      break;
+    case 2: // Poço
+      criarPoco(x, z);
+      break;
+    case 3: // Árvore caída
+      criarArvoreCaida(x, z);
+      break;
+    case 4: // Árvore em pé
+      criarArvoreEmPe(x, z);
+      break;
+  }
+}
+
+// === Função para criar objetos com base em matriz ===
+function criarObjetosPorMatriz(matriz, origemX = 0, origemZ = 0, espacamento = 60) {
+  const linhas = matriz.length;
+  const colunas = matriz[0].length;
+
+  const offsetX = -((colunas - 1) * espacamento) / 2;
+  const offsetZ = -((linhas - 1) * espacamento) / 2;
+
+  for (let linha = 0; linha < linhas; linha++) {
+    for (let coluna = 0; coluna < colunas; coluna++) {
+      const numero = matriz[linha][coluna];
+      if (numero !== 0) {
+        const x = origemX + coluna * espacamento + offsetX;
+        const z = origemZ + linha * espacamento + offsetZ;
+        criarObjetoPorNumero(numero, x, z);
+      }
+    }
+  }
+}
+
+// === Exemplo de matriz com cruz, poço, árvore caída e árvore em pé ===
+const mapaObjetos = [
+  [0,0,0,4,0,0,4,0,0],
+  [0,1,0,2,0,3,0,4,0],
+  [0,0,0,0,0,0,0,0,0],
+  [2,0,3,0,1,0,4,0,3],
+  [0,0,0,0,4,0,0,0,4]
+];
+
+// === Cria os objetos no mundo ===
+criarObjetosPorMatriz(mapaObjetos, 0, 0);
+
+
+
+
+
+
+
+
+
+
+
+ // === Função placeBlock que retorna o Mesh ===
+function placeBlock(x, y, z, tipo) {
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  let color = 0xffffff;
+
+  if (tipo === "wood") color = 0x8b4513;
+  else if (tipo === "grass") color = 0x228b22;
+  else if (tipo === "stone") color = 0x888888;
+  else if (tipo === "purple") color = 0x800080; // cubo roxo
+
+  const material = new THREE.MeshStandardMaterial({ color });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(x, y, z);
+
+  world.add(mesh);
+  cubes.push(mesh);
+
+  return mesh;
+}
+
+// === Árvores ===
+const arvores = [];
+
+function criarArvore(x, z, altura = 4) {
+  const blocos = [];
+  for (let i = 0; i < altura; i++) {
+    blocos.push(placeBlock(x, i, z, "wood"));
+  }
+  const topo = altura;
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dz = -1; dz <= 1; dz++) {
+      for (let dy = 0; dy <= 1; dy++) {
+        const distancia = Math.abs(dx) + Math.abs(dz) + dy;
+        if (distancia <= 2) {
+          blocos.push(placeBlock(x + dx, topo + dy, z + dz, "grass"));
+        }
+      }
+    }
+  }
+  arvores.push(blocos);
+}
+
+function gerarArvoresEspalhadas(qtd = 30, area = 200, minDist = 20) {
+  arvores.forEach(blocos => {
+    blocos.forEach(bloco => {
+      if (bloco) {
+        if (scene) scene.remove(bloco);
+        if (world) world.remove(bloco);
+      }
+    });
+  });
+  arvores.length = 0;
+
+  const geradas = [];
+  while (geradas.length < qtd) {
+    const x = Math.floor(Math.random() * area) - area / 2;
+    const z = Math.floor(Math.random() * area) - area / 2;
+
+    const longe = geradas.every(pos => {
+      const dx = pos.x - x;
+      const dz = pos.z - z;
+      return Math.sqrt(dx * dx + dz * dz) >= minDist;
+    });
+
+    if (longe) {
+      criarArvore(x, z);
+      geradas.push({ x, z });
+    }
+  }
+}
+
+// Cria árvores inicialmente
+gerarArvoresEspalhadas(30, 200, 20);
+
+// === Catedral ===
+let catedralCriada = false;
+const catedralBlocos = [];
+
+function criarCatedral() {
+  const offsetX = -370;
+  const offsetY =  0;
+  const offsetZ = -370;
+
+  const larguraLocal = 40;
+  const profundidade = 40;
+  const alturaBase = 6;
+  const alturaMaxima = 20;
+
+  let highestY = 0;
+  let highestX = offsetX;
+  let highestZ = offsetZ;
+
+  // BASE
+  for (let y = 0; y < alturaBase; y++) {
+    for (let x = 0; x < larguraLocal; x += 2) {
+      for (let z = 0; z < profundidade; z += 2) {
+        const borda = x === 0 || x === larguraLocal - 2 || z === 0 || z === profundidade - 2;
+        const chanceBuraco = Math.random() < 0.3;
+        if (borda && !chanceBuraco) {
+          catedralBlocos.push(placeBlock(offsetX + x, offsetY + y, offsetZ + z, "stone"));
+          if (y > highestY) { highestY = y; highestX = offsetX + x; highestZ = offsetZ + z; }
+        }
+      }
+    }
+  }
+
+
+
+// TOPO IRREGULAR
+  for (let x = 2; x < larguraLocal - 2; x += 2) {
+    for (let z = 2; z < profundidade - 2; z += 2) {
+      const alturaAleatoria = alturaBase + Math.floor(Math.random() * (alturaMaxima - alturaBase));
+      for (let y = alturaBase; y < alturaAleatoria; y++) {
+        const bordaInterna = x === 2 || x === larguraLocal - 4 || z === 2 || z === profundidade - 4;
+        const chanceBuraco = Math.random() < 0.4;
+        if (bordaInterna && !chanceBuraco) {
+          catedralBlocos.push(placeBlock(offsetX + x, offsetY + y, offsetZ + z, "stone"));
+          if (y > highestY) { highestY = y; highestX = offsetX + x; highestZ = offsetZ + z; }
+        }
+      }
+    }
+  }
+
+  // Colunas partidas
+  const centroX = Math.floor(larguraLocal / 2);
+  const centroZ = Math.floor(profundidade / 2);
+
+  for (let i = 0; i < 5; i++) {
+    const cx = centroX + Math.floor(Math.random() * 20 - 10);
+    const cz = centroZ + Math.floor(Math.random() * 20 - 10);
+    const alturaColuna = 2 + Math.floor(Math.random() * 4);
+    for (let y = 0; y < alturaColuna; y++) {
+      catedralBlocos.push(placeBlock(offsetX + cx, offsetY + y, offsetZ + cz, "stone"));
+      if (y > highestY) { highestY = y; highestX = offsetX + cx; highestZ = offsetZ + cz; }
+    }
+  }
+
+  // Pedaços espalhados
+  for (let i = 0; i < 20; i++) {
+    const rx = centroX + Math.floor(Math.random() * 30 - 15);
+    const rz = centroZ + Math.floor(Math.random() * 30 - 15);
+    const ry = Math.floor(Math.random() * 2);
+    catedralBlocos.push(placeBlock(offsetX + rx, offsetY + ry, offsetZ + rz, "stone"));
+  }
+
+  // === Cubo roxo no topo mais alto ===
+  catedralBlocos.push(placeBlock(highestX, highestY + 1, highestZ, "purple"));
+
+  alert("✅ Catedral criada!");
+}
+
+function removerCatedral() {
+  catedralBlocos.forEach(bloco => {
+    if (bloco) {
+      if (scene) scene.remove(bloco);
+      if (world) world.remove(bloco);
+    }
+  });
+  catedralBlocos.length = 0;
+  alert("❌ Catedral removida!");
+  gerarArvoresEspalhadas(30, 200, 20);
+}
+
+// === Porta especial com opacidade ===
+const portaGeo = new THREE.BoxGeometry(2, 4, 1);
+const portaMat = new THREE.MeshStandardMaterial({
+  color: 0x8B4513,
+  transparent: true,
+  opacity: 0.5
+});
+const porta = new THREE.Mesh(portaGeo, portaMat);
+porta.position.set(-355, 2, -355);
+world.add(porta);
+cubes.push(porta);
+
+let portaCooldown = false;
+
+function ativarPorta() {
+  if (portaCooldown) return;
+
+  if (!catedralCriada) {
+    gerarArvoresEspalhadas(0);
+    criarCatedral();
+    catedralCriada = true;
+    porta.material.color.set(0x228b22);
+  } else {
+    removerCatedral();
+    catedralCriada = false;
+    porta.material.color.set(0x8B4513);
+  }
+
+  portaCooldown = true;
+  setTimeout(() => portaCooldown = false, 3000);
+}
+
+// === Loop de colisão ===
+setInterval(() => {
+  const posPersonagem = (typeof player !== "undefined") ? player.position : camera.position;
+  const personagemBox = new THREE.Box3().setFromCenterAndSize(posPersonagem, new THREE.Vector3(1, 2, 1));
+  const portaBox = new THREE.Box3().setFromObject(porta);
+
+  if (personagemBox.intersectsBox(portaBox)) {
+    ativarPorta();
+  }
+}, 200);
+
+
+
+
+
+
+
+
+
+
+
+
+/*ative o caminho para a montanha pirâmide, remova as 
+declarações de comentários*/
+
+// montanha pirâmide simples escalável com alguns cubos e porta 
+/*
+// === Função placeBlock para cubos (árvores e pirâmide) ===
+function placeBlock(x, y, z, tipo) {
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  let color = 0xffffff;
+
+  if (tipo === "wood") color = 0x8b4513;
+  else if (tipo === "grass") color = 0x228b22;
+  else if (tipo === "stone") color = 0x888888;
+  else if (tipo === "black") color = 0x000000; // cubo preto especial
+
+  const material = new THREE.MeshStandardMaterial({ color });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(x, y, z);
+
+  world.add(mesh);
+  cubes.push(mesh);
+
+  return mesh;
+}
+
+// === Árvores normais (cubos) ===
+const arvores = [];
+
+function criarArvore(x, z, altura = 4) {
+  const blocos = [];
+  for (let i = 0; i < altura; i++) {
+    blocos.push(placeBlock(x, i, z, "wood"));
+  }
+  const topo = altura;
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dz = -1; dz <= 1; dz++) {
+      for (let dy = 0; dy <= 1; dy++) {
+        const distancia = Math.abs(dx) + Math.abs(dz) + dy;
+        if (distancia <= 2) {
+          blocos.push(placeBlock(x + dx, topo + dy, z + dz, "grass"));
+        }
+      }
+    }
+  }
+  arvores.push(blocos);
+}
+
+function gerarArvoresEspalhadas(qtd = 30, area = 200, minDist = 20) {
+  arvores.forEach(blocos => {
+    blocos.forEach(bloco => {
+      if (bloco) {
+        if (scene) scene.remove(bloco);
+        if (world) world.remove(bloco);
+      }
+    });
+  });
+  arvores.length = 0;
+
+  const geradas = [];
+  while (geradas.length < qtd) {
+    const x = Math.floor(Math.random() * area) - area / 2;
+    const z = Math.floor(Math.random() * area) - area / 2;
+
+    const longe = geradas.every(pos => {
+      const dx = pos.x - x;
+      const dz = pos.z - z;
+      return Math.sqrt(dx * dx + dz * dz) >= minDist;
+    });
+
+    if (longe) {
+      criarArvore(x, z);
+      geradas.push({ x, z });
+    }
+  }
+}
+
+// === Pirâmide escalável ===
+function criarPiramideOca(xBase, yBase, zBase, larguraBase, altura, tipo = "stone", tipoTopo = "grass") {
+  const blocos = [];
+
+  for (let camada = 0; camada < altura; camada++) {
+    const larguraAtual = larguraBase - camada * 2;
+    const y = yBase + camada;
+    const xInicio = xBase + camada;
+    const zInicio = zBase + camada;
+    const tipoBloco = (camada === altura - 1) ? tipoTopo : tipo;
+
+    for (let dx = 0; dx < larguraAtual; dx++) {
+      for (let dz = 0; dz < larguraAtual; dz++) {
+        const naBorda = (
+          dx === 0 || dz === 0 ||
+          dx === larguraAtual - 1 || dz === larguraAtual - 1
+        );
+
+        if (naBorda || camada === altura - 1) {
+          blocos.push({
+            x: xInicio + dx,
+            y: y,
+            z: zInicio + dz,
+            tipo: tipoBloco
+          });
+        }
+      }
+    }
+  }
+
+  return blocos;
+}
+
+// === Montanha pirâmide controlada pela porta ===
+let montanhaCriada = false;
+const montanhaBlocos = [];
+
+function criarMontanha() {
+  const piramide = criarPiramideOca(365, 0, 365, 30, 8);
+  for (const bloco of piramide) {
+    const mesh = placeBlock(bloco.x, bloco.y, bloco.z, bloco.tipo);
+    montanhaBlocos.push(mesh);
+  }
+
+  // === Cubos extras espalhados (20 no total) ===
+  let extras = 0;
+  while (extras < 20) {
+    const camada = Math.floor(Math.random() * 8); // altura da pirâmide
+    const larguraAtual = 30 - camada * 2;
+    const xInicio = 30 + camada;
+    const zInicio = 50 + camada;
+    const y = camada;
+
+    const dx = Math.floor(Math.random() * larguraAtual);
+    const dz = Math.floor(Math.random() * larguraAtual);
+
+    const tipoExtra = (extras === 19) ? "black" : "stone"; // último cubo é preto no topo
+    const mesh = placeBlock(xInicio + dx, y + 1, zInicio + dz, tipoExtra);
+    montanhaBlocos.push(mesh);
+
+    extras++;
+  }
+
+  alert("✅ Montanha pirâmide criada com cubos extras!");
+}
+
+function removerMontanha() {
+  montanhaBlocos.forEach(bloco => {
+    if (bloco) {
+      if (scene) scene.remove(bloco);
+      if (world) world.remove(bloco);
+    }
+  });
+  montanhaBlocos.length = 0;
+  alert("❌ Montanha removida!");
+  gerarArvoresEspalhadas(30, 200, 20);
+}
+
+// === Porta especial com opacidade ===
+const portaGeo = new THREE.BoxGeometry(2, 4, 1);
+const portaMat = new THREE.MeshStandardMaterial({
+  color: 0x8B4513,
+  transparent: true,
+  opacity: 0.5
+});
+const porta = new THREE.Mesh(portaGeo, portaMat);
+porta.position.set(355, 2, 355);
+world.add(porta);
+cubes.push(porta);
+
+let portaCooldown = false;
+
+// === Ativação com cooldown ===
+function ativarPorta() {
+  if (portaCooldown) return;
+
+  if (!montanhaCriada) {
+    gerarArvoresEspalhadas(0);
+    criarMontanha();
+    montanhaCriada = true;
+    porta.material.color.set(0x228b22);
+  } else {
+    removerMontanha();
+    montanhaCriada = false;
+    porta.material.color.set(0x8B4513);
+  }
+
+  portaCooldown = true;
+  setTimeout(() => portaCooldown = false, 3000);
+}
+
+// === Loop de colisão ===
+setInterval(() => {
+  const posPersonagem = (typeof player !== "undefined") ? player.position : camera.position;
+  const personagemBox = new THREE.Box3().setFromCenterAndSize(posPersonagem, new THREE.Vector3(1, 2, 1));
+  const portaBox = new THREE.Box3().setFromObject(porta);
+
+  if (personagemBox.intersectsBox(portaBox)) {
+    ativarPorta();
+  }
+}, 200);
+
+// === Inicializa árvores ===
+//gerarArvoresEspalhadas(30, 200, 20);
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*🟨🟨🟨🟨⛏️⛏️⛏️
+
+     🟨⛏️⛏️🟨
+
+  ⛏️⛏️⛏️🟨🟨🟨🟨*/
+/*
+// inventário instrumentos remover ouro
+
+//Remove inventário do ângulo 
+(function () {
+  // Remove barra de inventário se existir
+  const barra = document.getElementById("barraInventario");
+  if (barra) barra.remove();
+
+  // Remove botão de crafting se existir
+  const botao = document.getElementById("botaoCrafitar");
+  if (botao) botao.remove();
+
+  // Remove estilos adicionados
+  const style = Array.from(document.head.querySelectorAll("style"))
+    .find(s => s.textContent.includes(".slotItem"));
+  if (style) style.remove();
+
+  // Opcional: limpar inventário global se existir
+  if (typeof inventario !== "undefined") {
+    inventario.length = 0;
+  }
+
+  alert("❌ Inventário e crafting removidos do editor!");
+})();
+
+
+
+
+
+
+
+// Script para remover inventário do ângulo 
+
+(function () {
+  // === REMOVER INVENTÁRIO VISUAL ===
+  const barra = document.getElementById("barraInventario");
+  if (barra) {
+    barra.remove();
+    console.log("🗑️ Barra de inventário removida.");
+  }
+
+  // === REMOVER BOTÃO DE CRAFTING ===
+  const botao = document.getElementById("botaoCrafitar");
+  if (botao) {
+    botao.remove();
+    console.log("🗑️ Botão de crafting removido.");
+  }
+
+  // === REMOVER ESTILO INVENTÁRIO ===
+  const style = document.querySelector("style");
+  if (style && style.textContent.includes(".slotItem")) {
+    style.remove();
+    console.log("🗑️ Estilo de inventário removido.");
+  }
+
+  alert("✅ Inventário removido com sucesso!");
+})();
+
+
+
+
+
+
+
+
+
+
+
+// inventário espinhos de peixe remove ouro
+
+(function () {
+  if (document.getElementById("barraInventario")) return;
+
+  const inventario = [];
+  let bracoAtivo = null;
+  let tipoBraco = null;
+
+  // === INVENTÁRIO VISUAL ===
+  const barra = document.createElement("div");
+  barra.id = "barraInventario";
+  barra.style = `
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    background: rgba(0,0,0,0.5);
+    padding: 6px 10px;
+    border-radius: 8px;
+    z-index: 1000;
+  `;
+  document.body.appendChild(barra);
+
+  const style = document.createElement("style");
+  style.textContent = `
+    .slotItem {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #fff;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+    .slotItem.selected {
+      border-color: yellow;
+      box-shadow: 0 0 8px yellow;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // === BOTÃO CRAFTING ===
+  const botao = document.createElement("button");
+  botao.id = "botaoCrafitar";
+  botao.textContent = "🛠️ Crafitar";
+  botao.style = `
+    position: absolute;
+    bottom: 70px;
+    right: 10px;
+    padding: 10px 16px;
+    font-size: 16px;
+    background: #333;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    z-index: 1000;
+  `;
+  document.body.appendChild(botao);
+
+  // === CRIA BRAÇO ===
+  function criarBracoSolto(cor = "#ffffff", tipo = "branco") {
+    if (bracoAtivo) {
+      camera.remove(bracoAtivo);
+      bracoAtivo = null;
+    }
+
+    let braco;
+
+    if (tipo === "preto") {
+      const grupo = new THREE.Group();
+      const haste = new THREE.Mesh(
+        new THREE.BoxGeometry(0.1, 0.1, 2.5),
+        new THREE.MeshStandardMaterial({ color: "#222222" })
+      );
+      haste.position.set(0, 0, -1.25);
+      grupo.add(haste);
+
+      const cabeca = new THREE.Mesh(
+        new THREE.BoxGeometry(0.6, 0.1, 0.1),
+        new THREE.MeshStandardMaterial({ color: "#444444" })
+      );
+      cabeca.position.set(0, 0.2, -2);
+      grupo.add(cabeca);
+
+      grupo.position.set(0.5, -0.5, -1.5);
+      grupo.rotation.y = Math.PI / 8;
+      braco = grupo;
+    } else if (tipo === "cinza") {
+      const grupo = new THREE.Group();
+      const haste = new THREE.Mesh(
+        new THREE.BoxGeometry(0.1, 0.1, 2.5),
+        new THREE.MeshStandardMaterial({ color: "#888888" })
+      );
+      haste.position.set(0, 0, -1.25);
+      grupo.add(haste);
+
+      for (let i = 0; i < 6; i++) {
+        const espinho = new THREE.Mesh(
+          new THREE.ConeGeometry(0.1, 0.3, 4),
+          new THREE.MeshStandardMaterial({ color: "#aaaaaa" })
+        );
+
+//###############
+        espinho.rotation.x = Math.PI;
+        espinho.position.set(0, 0, -0.4 * i);
+        grupo.add(espinho);
+//###############
+
+      }
+
+      grupo.position.set(0.5, -0.5, -1.5);
+      grupo.rotation.y = Math.PI / 8;
+      braco = grupo;
+    } else {
+      const geometry = new THREE.BoxGeometry(0.3, 0.3, 3);
+      const material = new THREE.MeshStandardMaterial({ color: cor });
+      braco = new THREE.Mesh(geometry, material);
+      braco.position.set(0.5, -0.5, -1.5);
+      braco.rotation.y = Math.PI / 8;
+    }
+
+    camera.add(braco);
+    scene.add(camera);
+    bracoAtivo = braco;
+    tipoBraco = tipo;
+  }
+
+  // === LOOP DE COLISÃO ===
+  setInterval(() => {
+    if (!bracoAtivo) return;
+    const bracoBox = new THREE.Box3().setFromObject(bracoAtivo);
+
+    for (let i = cubes.length - 1; i >= 0; i--) {
+      const cubo = cubes[i];
+      const cuboBox = new THREE.Box3().setFromObject(cubo);
+      const tipo = cubo.userData.tipo;
+
+      if (bracoBox.intersectsBox(cuboBox)) {
+        if (tipoBraco === "branco" && tipo === "especial") {
+          cubo.parent?.remove(cubo);
+          cubes.splice(i, 1);
+          inventario.push("800080");
+          atualizarInventario();
+        }
+
+        if (tipoBraco === "roxo" && tipo === "preto") {
+          cubo.parent?.remove(cubo);
+          cubes.splice(i, 1);
+          inventario.push("555555");
+          atualizarInventario();
+        }
+
+        if (tipoBraco === "preto" && tipo === "cinza") {
+          cubo.parent?.remove(cubo);
+          cubes.splice(i, 1);
+          inventario.push("888888");
+          atualizarInventario();
+        }
+
+        if (tipoBraco === "cinza" && tipo === "amarelo") {
+          cubo.parent?.remove(cubo);
+          cubes.splice(i, 1);
+          inventario.push("ffff00");
+          atualizarInventario();
+        }
+      }
+    }
+  }, 100);
+
+  // === INVENTÁRIO ===
+  function atualizarInventario() {
+    const contagem = {};
+    inventario.forEach(cor => {
+      contagem[cor] = (contagem[cor] || 0) + 1;
+    });
+
+    barra.innerHTML = "";
+    Object.entries(contagem).forEach(([cor, qtd]) => {
+      const slot = document.createElement("div");
+      slot.className = "slotItem";
+      slot.style.background = "#" + cor;
+      slot.title = `${cor} (${qtd})`;
+
+      slot.addEventListener("click", () => {
+        const index = inventario.findIndex(c => c === cor);
+        if (index !== -1) {
+          inventario.splice(index, 1);
+          atualizarInventario();
+
+          if (isSphere === true) {
+            if (cor === "8b4513") criarBracoSolto("#ffffff", "branco");
+            else if (cor === "800080") criarBracoSolto("#800080", "roxo");
+            else if (cor === "555555") criarBracoSolto("#222222", "preto");
+            else if (cor === "888888") criarBracoSolto("#888888", "cinza");
+          }
+        }
+      });
+
+      barra.appendChild(slot);
+    });
+  }
+
+  // === CRAFTING ===
+  function encontrarBlocoProximo() {
+    const px = camera.position.x;
+    const py = -world.position.y;
+    const pz = camera.position.z;
+    let maisProximo = null;
+    let menorDist = Infinity;
+
+    for (let i = 0; i < cubes.length; i++) {
+      const mesh = cubes[i];
+      const dx = px - (mesh.position.x + world.position.x);
+      const dy = py - mesh.position.y;
+      const dz = pz - (mesh.position.z + world.position.z);
+      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      if (dist < 1.5 && dist < menorDist) {
+        menorDist = dist;
+        maisProximo = mesh;
+      }
+    }
+
+    return maisProximo;
+  }
+
+  function removerBlocosConectados(base) {
+    const visitados = new Set();
+    const fila = [base];
+    const coresRemovidas = [];
+
+    while (fila.length > 0) {
+      const atual = fila.pop();
+      if (!atual || visitados.has(atual.uuid)) continue;
+
+      visitados.add(atual.uuid);
+      const cor = atual.material.color.getHexString().toLowerCase();
+    //  coresRem
+
+
+
+coresRemovidas.push(cor);
+
+      if (atual.parent) atual.parent.remove(atual);
+      const index = cubes.findIndex(c => c.uuid === atual.uuid);
+      if (index !== -1) cubes.splice(index, 1);
+
+      const vizinhos = cubes.filter(c => {
+        const dx = Math.abs(c.position.x - atual.position.x);
+        const dy = Math.abs(c.position.y - atual.position.y);
+        const dz = Math.abs(c.position.z - atual.position.z);
+        return dx + dy + dz === 1;
+      });
+
+      fila.push(...vizinhos);
+    }
+
+    return coresRemovidas;
+  }
+
+  function crafitarCubo() {
+    const alvo = encontrarBlocoProximo();
+    if (alvo) {
+      const cores = removerBlocosConectados(alvo);
+      inventario.push(...cores);
+      atualizarInventario();
+      alert(`✅ ${cores.length} blocos coletados!`);
+    } else {
+      alert("❌ Nenhum cubo próximo para crafitar.");
+    }
+  }
+
+  botao.addEventListener("click", crafitarCubo);
+*/ /*
+  // === ÁRVORES ===
+  for (let t = 0; t < 5; t++) {
+    const x = t * 6;
+    const y = 0;
+    const z = 0;
+    const altura = 4;
+
+    for (let i = 0; i < altura; i++) {
+      placeBlock(x, y + i, z, "wood");
+    }
+
+    const topo = y + altura;
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        for (let dy = 0; dy <= 2; dy++) {
+          const distancia = Math.abs(dx) + Math.abs(dz) + dy;
+          if (distancia <= 3) {
+            placeBlock(x + dx, topo + dy, z + dz, "grass");
+          }
+        }
+      }
+    }
+  }*/
+/*
+  // === CUBOS ESPECIAIS ===
+  function criarCuboEspecial(x, y, z) {
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshStandardMaterial({ color: '#800080' }); // roxo
+    const cubo = new THREE.Mesh(geometry, material);
+    cubo.position.set(x, y, z);
+    cubo.userData.tipo = "especial";
+    world.add(cubo);
+    cubes.push(cubo);
+  }
+
+  function criarCuboPreto(x, y, z) {
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshStandardMaterial({ color: '#000000' }); // preto
+    const cubo = new THREE.Mesh(geometry, material);
+    cubo.position.set(x, y, z);
+    cubo.userData.tipo = "preto";
+    world.add(cubo);
+    cubes.push(cubo);
+  }
+
+  function criarCuboCinza(x, y, z) {
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshStandardMaterial({ color: '#555555' }); // cinza
+    const cubo = new THREE.Mesh(geometry, material);
+    cubo.position.set(x, y, z);
+    cubo.userData.tipo = "cinza";
+    world.add(cubo);
+    cubes.push(cubo);
+  }
+
+  function criarCuboAmarelo(x, y, z) {
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshStandardMaterial({ color: '#ffff00' }); // amarelo
+    const cubo = new THREE.Mesh(geometry, material);
+    cubo.position.set(x, y, z);
+    cubo.userData.tipo = "amarelo";
+    world.add(cubo);
+    cubes.push(cubo);
+  }
+
+  // Cria cubos especiais para teste
+  criarCuboEspecial(2, 1, 0); // roxo
+  criarCuboPreto(4, 1, 0);    // preto
+  criarCuboCinza(6, 1, 0);    // cinza
+  criarCuboAmarelo(8, 1, 0);  // amarelo
+
+  alert("✅ Sistema completo: braço branco → roxo → preto (picareta) → cinza (espinhos) → amarelo!");
+})();
+
+
+
+
+(function () {
+  if (document.getElementById("barraInventario")) return;
+
+  const inventario = [];
+  let bracoAtivo = null;
+  let tipoBraco = null;
+
+  // === INVENTÁRIO VISUAL ===
+  const barra = document.createElement("div");
+  barra.id = "barraInventario";
+  barra.style.position = "absolute";
+  barra.style.bottom = "10px";
+  barra.style.left = "50%";
+  barra.style.transform = "translateX(-50%)";
+  barra.style.display = "flex";
+  barra.style.gap = "6px";
+  barra.style.background = "rgba(0,0,0,0.5)";
+  barra.style.padding = "6px 10px";
+  barra.style.borderRadius = "8px";
+  barra.style.zIndex = "1000";
+  document.body.appendChild(barra);
+
+  const style = document.createElement("style");
+  style.textContent = `
+    .slotItem {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #fff;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+    .slotItem.selected {
+      border-color: yellow;
+      box-shadow: 0 0 8px yellow;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // === BOTÃO CRAFTING ===
+  const botao = document.createElement("button");
+  botao.id = "botaoCrafitar";
+  botao.textContent = "🛠️ Crafitar";
+  botao.style.position = "absolute";
+  botao.style.bottom = "70px";
+  botao.style.right = "10px";
+  botao.style.padding = "10px 16px";
+  botao.style.fontSize = "16px";
+  botao.style.background = "#333";
+  botao.style.color = "#fff";
+  botao.style.border = "2px solid #fff";
+  botao.style.borderRadius = "6px";
+  botao.style.cursor = "pointer";
+  botao.style.zIndex = "1000";
+  document.body.appendChild(botao);
+
+  // === CRIA BRAÇO ===
+  function criarBracoSolto(cor = "#ffffff", tipo = "branco") {
+    if (bracoAtivo) {
+      camera.remove(bracoAtivo);
+      bracoAtivo = null;
+    }
+
+    let braco;
+
+    if (tipo === "preto") {
+      const grupo = new THREE.Group();
+      const haste = new THREE.Mesh(
+        new THREE.BoxGeometry(0.1, 0.1, 2.5),
+        new THREE.MeshStandardMaterial({ color: "#222222" })
+      );
+      haste.position.set(0, 0, -1.25);
+      grupo.add(haste);
+
+      const cabeca = new THREE.Mesh(
+        new THREE.BoxGeometry(0.6, 0.1, 0.1),
+        new THREE.MeshStandardMaterial({ color: "#444444" })
+      );
+      cabeca.position.set(0, 0.2, -2);
+      grupo.add(cabeca);
+
+      grupo.position.set(0.5, -0.5, -1.5);
+      grupo.rotation.y = Math.PI / 8;
+      braco = grupo;
+    } else if (tipo === "cinza") {
+      const grupo = new THREE.Group();
+      const haste = new THREE.Mesh(
+        new THREE.BoxGeometry(0.1, 0.1, 2.5),
+        new THREE.MeshStandardMaterial({ color: "#888888" })
+      );
+      haste.position.set(0, 0, -1.25);
+      grupo.add(haste);
+
+      for (let i = 0; i < 6; i++) {
+        const espinho = new THREE.Mesh(
+          new THREE.ConeGeometry(0.1, 0.3, 4),
+          new THREE.MeshStandardMaterial({ color: "#aaaaaa" })
+        );
+        espinho.rotation.x = Math.PI;
+        espinho.position.set(0, 0.15, -0.4 * i);
+        grupo.add(espinho);
+      }
+
+      grupo.position.set(0.5, -0.5, -1.5);
+      grupo.rotation.y = Math.PI / 8;
+      braco = grupo;
+    } else {
+      const geometry = new THREE.BoxGeometry(0.3, 0.3, 3);
+      const material = new THREE.MeshStandardMaterial({ color: cor });
+      braco = new THREE.Mesh(geometry, material);
+      braco.position.set(0.5, -0.5, -1.5);
+      braco.rotation.y = Math.PI / 8;
+    }
+
+    camera.add(braco);
+    scene.add(camera);
+    bracoAtivo = braco;
+    tipoBraco = tipo;
+  }
+
+  // === LOOP DE COLISÃO ===
+  setInterval(() => {
+    if (!bracoAtivo) return;
+    const bracoBox = new THREE.Box3().setFromObject(bracoAtivo);
+
+    for (let i = cubes.length - 1; i >= 0; i--) {
+      const cubo = cubes[i];
+      const cuboBox = new THREE.Box3().setFromObject(cubo);
+      const tipo = cubo.userData.tipo;
+
+      if (bracoBox.intersectsBox(cuboBox)) {
+        if (tipoBraco === "branco" && tipo === "especial") {
+          if (cubo.parent) cubo.parent.remove(cubo);
+          cubes.splice(i, 1);
+          inventario.push("800080");
+          atualizarInventario();
+        }
+
+        if (tipoBraco === "roxo" && tipo === "preto") {
+          if (cubo.parent) cubo.parent.remove(cubo);
+          cubes.splice(i, 1);
+          inventario.push("555555");
+          atualizarInventario();
+        }
+
+        if (tipoBraco === "preto" && tipo === "cinza") {
+          if (cubo.parent) cubo.parent.remove(cubo);
+          cubes.splice(i, 1);
+          inventario.push("888888");
+          atualizarInventario();
+        }
+      }
+    }
+  }, 100);
+
+  // === INVENTÁRIO ===
+  function atualizarInventario() {
+    const contagem = {};
+    inventario.forEach(cor => {
+      contagem[cor] = (contagem[cor] || 0) + 1;
+    });
+
+    barra.innerHTML = "";
+    Object.entries(contagem).forEach(([cor, qtd]) => {
+      const slot = document.createElement("div");
+      slot.className = "slotItem";
+      slot.style.background = "#" + cor;
+      slot.title = `${cor} (${qtd})`;
+
+      slot.addEventListener("click", () => {
+        const index = inventario.findIndex(c => c === cor);
+        if (index !== -1) {
+          inventario.splice(index, 1);
+          atualizarInventario();
+
+          if (isSphere === true) {
+            if (cor === "8b4513") criarBracoSolto("#ffffff", "branco");
+            else if (cor === "800080") criarBracoSolto("#800080", "roxo");
+            else if (cor === "555555") criarBracoSolto("#222222", "preto");
+            else if (cor === "888888") criarBracoSolto("#888888", "cinza");
+          }
+        }
+      });
+
+      barra.appendChild(slot);
+    });
+  }
+
+  // === CRAFTING ===
+  function encontrarBlocoProximo() {
+    const px = camera.position.x;
+    const py = -world.position.y;
+    const pz = camera.position.z;
+    let maisProximo = null;
+    let menorDist = Infinity;
+
+    for (let i = 0; i < cubes.length; i++) {
+      const mesh = cubes[i];
+      const dx = px - (mesh.position.x + world.position.x);
+      const dy = py - mesh.position.y;
+      const dz = pz - (mesh.position.z + world.position.z);
+      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      if (dist < 1.5 && dist < menorDist) {
+        menorDist = dist;
+        maisProximo = mesh;
+      }
+    }
+
+    return maisProximo;
+  }
+
+  function removerBlocosConectados(base) {
+    const visitados = new Set();
+    const fila = [base];
+    const coresRemovidas = [];
+
+    while (fila.length > 0) {
+      const atual = fila.pop();
+      if (!atual || visitados.has(atual.uuid)) continue;
+
+      visitados.add(atual.uuid);
+      const cor = atual.material.color.getHexString().toLowerCase();
+   //   coresRemovidas.push
+
+
+
+
+
+coresRemovidas.push(cor);
+
+      if (atual.parent) atual.parent.remove(atual);
+      const index = cubes.findIndex(c => c.uuid === atual.uuid);
+      if (index !== -1) cubes.splice(index, 1);
+
+      const vizinhos = cubes.filter(c => {
+        const dx = Math.abs(c.position.x - atual.position.x);
+        const dy = Math.abs(c.position.y - atual.position.y);
+        const dz = Math.abs(c.position.z - atual.position.z);
+        return dx + dy + dz === 1;
+      });
+
+      fila.push(...vizinhos);
+    }
+
+    return coresRemovidas;
+  }
+
+  function crafitarCubo() {
+    const alvo = encontrarBlocoProximo();
+    if (alvo) {
+      const cores = removerBlocosConectados(alvo);
+      inventario.push(...cores);
+      atualizarInventario();
+      alert(`✅ ${cores.length} blocos coletados!`);
+    } else {
+      alert("❌ Nenhum cubo próximo para crafitar.");
+    }
+  }
+
+  botao.addEventListener("click", crafitarCubo);
+
+  // === ÁRVORES ===
+  for (let t = 0; t < 5; t++) {
+    const x = t * 6;
+    const y = 0;
+    const z = 0;
+    const altura = 4;
+
+    for (let i = 0; i < altura; i++) {
+      placeBlock(x, y + i, z, "wood");
+    }
+
+    const topo = y + altura;
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        for (let dy = 0; dy <= 2; dy++) {
+          const distancia = Math.abs(dx) + Math.abs(dz) + dy;
+          if (distancia <= 3) {
+            placeBlock(x + dx, topo + dy, z + dz, "grass");
+          }
+        }
+      }
+    }
+  }
+
+  // === CUBOS ESPECIAIS ===
+  function criarCuboEspecial(x, y, z) {
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshStandardMaterial({ color: '#800080' }); // roxo
+    const cubo = new THREE.Mesh(geometry, material);
+    cubo.position.set(x, y, z);
+    cubo.userData.tipo = "especial";
+    world.add(cubo);
+    cubes.push(cubo);
+  }
+
+  function criarCuboPreto(x, y, z) {
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshStandardMaterial({ color: '#000000' }); // preto
+    const cubo = new THREE.Mesh(geometry, material);
+    cubo.position.set(x, y, z);
+    cubo.userData.tipo = "preto";
+    world.add(cubo);
+    cubes.push(cubo);
+  }
+
+  function criarCuboCinza(x, y, z) {
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshStandardMaterial({ color: '#555555' }); // cinza
+    const cubo = new THREE.Mesh(geometry, material);
+    cubo.position.set(x, y, z);
+    cubo.userData.tipo = "cinza";
+    world.add(cubo);
+    cubes.push(cubo);
+  }
+
+  // Cria cubos especiais para teste
+  criarCuboEspecial(2, 1, 0); // roxo
+  criarCuboPreto(4, 1, 0);    // preto
+  criarCuboCinza(6, 1, 0);    // cinza
+
+  alert("✅ Sistema completo: braço branco → roxo → preto (picareta) → cinza (espinhos)!");
+})();
+*/
+
+
+
+
+
+
+
+
+
+
+
+</textarea><br>
+   
+    <button id="runCode">▶️ Executar Código</button>
+    <button onclick="exportarMundo()">💾 Salvar Mundo</button>
+    <label for="carregarMundo" style="background:#333; color:white; padding:6px 12px; cursor:pointer;">📂 Carregar Mundo</label>
+
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <script>
+
+
+const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    scene.background = new THREE.Color('#87CEEB');
+
+    const luz = new THREE.DirectionalLight(0xffffff, 1);
+    luz.position.set(10, 20, 10);
+    scene.add(luz);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+
+    const world = new THREE.Group();
+    scene.add(world);
+
+
+// Criar um canvas para textura
+const canvas = document.createElement('canvas');
+canvas.width = 1024;
+canvas.height = 1024;
+const ctx = canvas.getContext('2d');
+
+// Fundo verde (grama)
+ctx.fillStyle = '#3CAC3C';
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+// Função para desenhar manchas arredondadas
+function desenharMancha(x, y, raio, corCentro, corBorda) {
+  const grad = ctx.createRadialGradient(x, y, raio * 0.2, x, y, raio);
+  grad.addColorStop(0, corCentro);
+  grad.addColorStop(1, corBorda);
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(x, y, raio, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// Áreas de terra (marrom)
+desenharMancha(300, 300, 180, '#7B4F2F', '#3CAC3C');
+desenharMancha(700, 500, 220, '#6B3F2F', '#3CAC3C');
+
+// Áreas de areia (bege)
+desenharMancha(600, 200, 150, '#D2B48C', '#3CAC3C');
+desenharMancha(200, 700, 200, '#E0C68C', '#3CAC3C');
+
+// Criar textura a partir do canvas
+const texture = new THREE.CanvasTexture(canvas);
+
+// Aplicar no plano
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(1800, 1800),
+  new THREE.MeshStandardMaterial({ map: texture })
+);
+ground.rotation.x = -Math.PI / 2;
+ground.position.y = -3.5;
+world.add(ground);
+
+
+
+/*
+    const ground = new THREE.Mesh(
+      new THREE.PlaneGeometry(1800, 1800),
+      new THREE.MeshStandardMaterial({ color: '#3CAC3C' })
+    );
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -3.5;
+    world.add(ground);
+*/
+
+
+    const cubes = [];
+    const blocosCriados = [];
+
+    function placeBlock(x, y, z, tipo = "stone") {
+      const cores = {
+        stone: "#888888",
+        wood: "#a0522d",
+        grass: "#00cc66",
+        gold: "#ffd700",
+        iron: "#d8d8d8",
+        sand: "#f4e2b5"
+      };
+      const cor = cores[tipo] || "#ffffff";
+      const geometry = new THREE.BoxGeometry(1, 1, 1);
+      const material = new THREE.MeshStandardMaterial({ color: cor });
+      const block = new THREE.Mesh(geometry, material);
+      block.position.set(x, y, z);
+      world.add(block);
+      cubes.push(block);
+      blocosCriados.push({ x, y, z, tipo });
+    }
+
+    function exportarMundo() {
+      const data = JSON.stringify(blocosCriados, null, 2);
+      const blob = new Blob([data], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "meu_mundo.json";
+      link.click();
+    }
+
+    document.getElementById("carregarMundo").addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        try {
+          const blocos = JSON.parse(event.target.result);
+          blocos.forEach(b => placeBlock(b.x, b.y, b.z, b.tipo));
+        } catch (err) {
+          alert("Erro ao carregar o mundo: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById("runCode").addEventListener("click", () => {
+      const code = document.getElementById("codeInput").value;
+      try {
+        const func = new Function("placeBlock", code);
+        func(placeBlock);
+      } catch (e) {
+        alert("Erro no código: " + e.message);
+      }
+    });
+
+    function criarNuvem(x, y, z) {
+      const geometria = new THREE.BoxGeometry(2, 1, 1);
+      const material = new THREE.MeshStandardMaterial({ color: 'white' });
+      const nuvem = new THREE.Mesh(geometria, material);
+      nuvem.position.set(x, y, z);
+      scene.add(nuvem);
+    }
+
+    criarNuvem(5, 10, -10);
+    criarNuvem(-5, 12, -15);
+    criarNuvem(0, 11, -8);
+
+    const characterr = new THREE.Group();
+    characterr.position.y = -6.4;
+
+    const body = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 0.5), new THREE.MeshStandardMaterial({ color: 0x5555ff }));
+    body.position.y = 1.5;
+    characterr.add(body);
+
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), new THREE.MeshStandardMaterial({ color: 0xffff00 }));
+    head.position.y = 2.5;
+    characterr.add(head);
+
+    const armR = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.2, 0.3), new THREE.MeshStandardMaterial({ color: 0xcccccc }));
+    armR.position.set(0.65, 1.5, 0);
+    characterr.add(armR);
+
+    const armL = armR.clone();
+    armL.position.set(-0.65, 1.5, 0);
+    characterr.add(armL);
+
+    const legR = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.2, 0.4), new THREE.MeshStandardMaterial({ color: 0x8b4513 }));
+    legR.position.set(0.3, 0, 0);
+    characterr.add(legR);
+
+    const legL = legR.clone();
+    legL.position.set(-0.3, 0, 0);
+    characterr.add(legL);
+
+    scene.add(characterr);
+    camera.position.set(0, 1.6, 0);
+
+
+// Lista de blocos especiais com posições e tipos diferentes
+const blocosEspeciais = [
+  { x: 0, y: 0, z: 5, tipo: "gold" },
+  { x: 2, y: 0, z: 5, tipo: "wood" },
+  { x: -2, y: 0, z: 5, tipo: "stone" },
+  { x: 0, y: 0, z: 8, tipo: "brick" },
+  { x: 3, y: 0, z: 3, tipo: "obsidian" }
+];
+
+// Cria todos os blocos especiais com suas cores/tipos
+for (const bloco of blocosEspeciais) {
+  placeBlock(bloco.x, bloco.y, bloco.z, bloco.tipo);
+}
+
+
+let cooldown = false;
+
+function empurrarEParar() {
+  if (cooldown) return;
+  cooldown = true;
+
+  const impulso = 1.5;
+  const direcao = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw)).normalize();
+  world.position.add(direcao.multiplyScalar(impulso));
+
+  const direcoesOriginais = { ...direcoesAtivas };
+  direcoesAtivas.forward = false;
+  direcoesAtivas.backward = false;
+  direcoesAtivas.left = false;
+  direcoesAtivas.right = false;
+
+  setTimeout(() => {
+    Object.assign(direcoesAtivas, direcoesOriginais);
+    cooldown = false;
+  }, 10);
+}
+
+// Verifica colisão com todos os blocos especiais
+setInterval(() => {
+  const px = camera.position.x;
+  const py = -world.position.y;
+  const pz = camera.position.z;
+
+  for (const bloco of blocosEspeciais) {
+    const bx = bloco.x + world.position.x;
+    const by = bloco.y;
+    const bz = bloco.z + world.position.z;
+
+    const dx = Math.abs(px - bx);
+    const dy = Math.abs(py - (by + 1));
+    const dz = Math.abs(pz - bz);
+
+    if (dx < 0.5 && dy < 0.6 && dz < 0.5) {
+      empurrarEParar();
+      break;
+    }
+  }
+}, 10);
+
+
+const direcoesAtivas = { forward: false, backward: false, left: false, right: false };
+    let rotating = false, velocityY = 0, isJumping = false;
+    const gravity = 0.01, jumpStrength = -0.25;
+    let isSphere = false, armMesh = null, armAngle = 0;
+    const bullets = [], bulletSpeed = 0.5;
+    let isLooking = false, lastTouchX = 0, lastTouchY = 0;
+    let yaw = 0, pitch = 0, idleTime = 0;
+
+    function startMove(dir) { direcoesAtivas[dir] = true; }
+    function stopMove(dir) { direcoesAtivas[dir] = false; }
+
+    function transformToArm() {
+      if (!isSphere) {
+        characterr.visible = false;
+        const geometry = new THREE.BoxGeometry(0.3, 0.3, 3);
+        const material = new THREE.MeshStandardMaterial({ color: '#ffffff' });
+        armMesh = new THREE.Mesh(geometry, material);
+        scene.add(armMesh);
+        isSphere = true;
+      } else {
+        if (armMesh) {
+          scene.remove(armMesh);
+          armMesh = null;
+        }
+        characterr.visible = true;
+        isSphere = false;
+      }
+    }
+
+    function shootBullet() {
+      const origin = camera.position.clone();
+      const direction = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
+      const geometry = new THREE.SphereGeometry(0.1, 8, 8);
+      const material = new THREE.MeshStandardMaterial({ color: '#ffff00' });
+      const bullet = new THREE.Mesh(geometry, material);
+      bullet.position.copy(origin);
+      bullets.push({ mesh: bullet, direction });
+      scene.add(bullet);
+    }
+
+    document.getElementById('jump').addEventListener('touchstart', e => {
+      e.preventDefault();
+      if (!isJumping) {
+        velocityY = jumpStrength;
+        isJumping = true;
+      }
+    });
+
+    document.getElementById('left').addEventListener('touchstart', () => startMove('left'));
+    document.getElementById('right').addEventListener('touchstart', () => startMove('right'));
+    document.getElementById('forward').addEventListener('touchstart', () => startMove('forward'));
+    document.getElementById('backward').addEventListener('touchstart', () => startMove('backward'));
+    document.getElementById('left').addEventListener('touchend', () => stopMove('left'));
+    document.getElementById('right').addEventListener('touchend', () => stopMove('right'));
+    document.getElementById('forward').addEventListener('touchend', () => stopMove('forward'));
+    document.getElementById('backward').addEventListener('touchend', () => stopMove('backward'));
+    document.getElementById('morph').addEventListener('click', transformToArm);
+
+    document.addEventListener('keydown', (e) => {
+      switch (e.key.toLowerCase()) {
+        case 'w': startMove('forward'); break;
+        case 's': startMove('backward'); break;
+        case 'a': startMove('left'); break;
+        case 'd': startMove('right'); break;
+        case ' ': if (!isJumping) { velocityY = jumpStrength; isJumping = true; } break;
+        case 'r': rotating = true; break;
+        case 'm': transformToArm(); break;
+        case 'f': shootBullet(); break;
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      switch (e.key.toLowerCase()) {
+        case 'w': stopMove('forward'); break;
+        case 's': stopMove('backward'); break;
+        case 'a': stopMove('left'); break;
+        case 'd': stopMove('right'); break;
+        case 'r': rotating = false; break;
+      }
+    });
+
+    renderer.domElement.addEventListener('touchstart', e => {
+      if (e.touches.length === 1) {
+        isLooking = true;
+        lastTouchX = e.touches[0].clientX;
+        lastTouchY = e.touches[0].clientY;
+      }
+    });
+
+    renderer.domElement.addEventListener('touchmove', e => {
+      if (isLooking && e.touches.length === 1) {
+        const touch = e.touches[0];
+        const deltaX = touch.clientX - lastTouchX;
+        const deltaY = touch.clientY - lastTouchY;
+        yaw -= deltaX * 0.005;
+        pitch -= deltaY * 0.005;
+        pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch));
+        lastTouchX = touch.clientX;
+        lastTouchY = touch.clientY;
+      }
+    });
+
+    renderer.domElement.addEventListener('touchend', () => {
+      isLooking = false;
+    });
+
+    const toggleEditorBtn = document.createElement("button");
+    toggleEditorBtn.textContent = "Ocultar Editor";
+    toggleEditorBtn.style.position = "absolute";
+    toggleEditorBtn.style.top = "10px";
+    toggleEditorBtn.style.right = "10px";
+    toggleEditorBtn.style.zIndex = "1000";
+    toggleEditorBtn.style.padding = "8px 12px";
+    toggleEditorBtn.style.background = "#333";
+    toggleEditorBtn.style.color = "#fff";
+    toggleEditorBtn.style.border = "none";
+    toggleEditorBtn.style.borderRadius = "4px";
+    toggleEditorBtn.style.cursor = "pointer";
+    document.body.appendChild(toggleEditorBtn);
+
+    toggleEditorBtn.addEventListener("click", () => {
+      const panel = document.getElementById("codePanel");
+      if (!panel) return;
+      if (panel.style.display === "none") {
+        panel.style.display = "block";
+        toggleEditorBtn.textContent = "Ocultar Editor";
+      } else {
+        panel.style.display = "none";
+        toggleEditorBtn.textContent = "Mostrar Editor";
+      }
+    });
+
+
+
+
+
+
+// Lista de vaquinhas
+const vaquinhas = [];
+
+// Cria uma vaquinha com corpo, cabeça e patas
+function criarVacaAleatoria() {
+  const vaca = new THREE.Group();
+
+  // Corpo
+  const corpoGeo = new THREE.BoxGeometry(1, 1, 1.5);
+  const corpoMat = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
+  const corpo = new THREE.Mesh(corpoGeo, corpoMat);
+  corpo.position.set(0, 0.5, 0);
+  vaca.add(corpo);
+
+  // Cabeça
+  const cabecaGeo = new THREE.BoxGeometry(0.6, 0.6, 0.6);
+  const cabecaMat = new THREE.MeshStandardMaterial({ color: 0xA0522D });
+  const cabeca = new THREE.Mesh(cabecaGeo, cabecaMat);
+  cabeca.position.set(0, 0.6, 1.1);
+  vaca.add(cabeca);
+
+  // Pernas
+  const pernaGeo = new THREE.BoxGeometry(0.2, 0.6, 0.2);
+  const pernaMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+  const pernas = [];
+
+  const posicoes = [
+    [-0.35, -0.3,  0.5],
+    [ 0.35, -0.3,  0.5],
+    [-0.35, -0.3, -0.5],
+    [ 0.35, -0.3, -0.5]
+  ];
+
+  posicoes.forEach(pos => {
+    const perna = new THREE.Mesh(pernaGeo, pernaMat);
+    perna.position.set(...pos);
+    vaca.add(perna);
+    pernas.push(perna);
+  });
+
+  // Dados da vaquinha
+  vaca.userData = {
+    pernas,
+    passo: 0,
+    sentido: 1,
+    destino: gerarDestinoAleatorio(),
+    esperando: false,
+    esperaTimer: 0
+  };
+
+  vaca.position.set(-200, 0, 100);
+  world.add(vaca); // ✅ agora usando world.add
+  vaquinhas.push(vaca);
+}
+
+// Gera um destino aleatório no plano XZ
+function gerarDestinoAleatorio() {
+  const x = Math.random() * 20 - 10;
+  const z = Math.random() * 20 - 10;
+  return new THREE.Vector3(x, 0, z);
+}
+
+
+
+
+
+
+//**** scripts do editor do jogo****\\ 
+
+// imagem paisagem fundo local
+
+const texturaPaisagem = new THREE.TextureLoader().load('https://raw.githubusercontent.com/EdsonSimplcio/EdsonMemorieCard/refs/heads/main/minescriptpaisagem2.png  '); // ou 'imagens/paisagem.jpg' se estiver em subpasta
+
+const raio = 800;
+const altura = 850;
+const segmentos = 64;
+
+const geometriaCilindro = new THREE.CylinderGeometry(raio, raio, altura, segmentos, 1, true);
+const materialCilindro = new THREE.MeshBasicMaterial({
+  map: texturaPaisagem,
+  side: THREE.BackSide
+});
+
+const cilindroPaisagem = new THREE.Mesh(geometriaCilindro, materialCilindro);
+cilindroPaisagem.position.y = altura / 2 - 50;
+scene.add(cilindroPaisagem);
+
+
+
+
+
+// === Limite de Perímetro com Teletransporte ===
+const limitePerimetro = 250; // Metade de 500x500
+const pontoRetorno = new THREE.Vector3(0, 1.6, 0); // Posição segura para retornar
+
+function verificarLimiteETeleportar() {
+  const px = camera.position.x - world.position.x;
+  const pz = camera.position.z - world.position.z;
+
+  const foraDosLimites =
+    px > limitePerimetro || px < -limitePerimetro ||
+    pz > limitePerimetro || pz < -limitePerimetro;
+
+  if (foraDosLimites) {
+    world.position.set(0, 0, 0); // Reseta o mundo
+    camera.position.set(pontoRetorno.x, pontoRetorno.y, pontoRetorno.z); // Reposiciona a câmera
+    console.log("🚧 Você saiu da área permitida. Teletransportado de volta!");
+  }
+}
+
+// === Adiciona ao loop do editor ===
+if (typeof atualizacoesEditor === 'undefined') {
+  var atualizacoesEditor = [];
+}
+atualizacoesEditor.push(() => {
+  verificarLimiteETeleportar();
+});
+
+
+
+
+
+/*
+
+// criar árvores posicionada
+
+// Lista de árvores para controle de visibilidade
+const arvores = [];
+
+// Cria árvore estilo Minecraft com blocos
+function criarArvoreMinecraft(x, z, altura = 4) {
+  const y = 0;
+  const blocos = [];
+
+  // Tronco
+  for (let i = 0; i < altura; i++) {
+    const bloco = placeBlock(x, y + i, z, "wood");
+    blocos.push(bloco);
+  }
+
+  // Copa reduzida
+  const topo = y + altura;
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dz = -1; dz <= 1; dz++) {
+      for (let dy = 0; dy <= 1; dy++) {
+        const distancia = Math.abs(dx) + Math.abs(dz) + dy;
+        if (distancia <= 2) {
+          const bloco = placeBlock(x + dx, topo + dy, z + dz, "grass");
+          blocos.push(bloco);
+        }
+      }
+    }
+  }
+
+  // Armazena referência da árvore como um grupo de blocos
+  arvores.push({ x, z, blocos });
+}
+
+// Gera árvores espalhadas e distantes umas das outras
+function gerarArvoresEspalhadas(qtd = 30, area = 800, minDist = 20) {
+  const geradas = [];
+
+  while (geradas.length < qtd) {
+    const x = Math.floor(Math.random() * area) - area / 2;
+    const z = Math.floor(Math.random() * area) - area / 2;
+
+    // Verifica distância mínima entre árvores
+    const longe = geradas.every(pos => {
+      const dx = pos.x - x;
+      const dz = pos.z - z;
+      return Math.sqrt(dx * dx + dz * dz) >= minDist;
+    });
+
+    if (longe) {
+      criarArvoreMinecraft(x, z);
+      geradas.push({ x, z });
+    }
+  }
+}
+
+// Atualiza visibilidade das árvores com base no campo de visão
+function atualizarVisibilidadeArvores(anguloVisao = Math.PI / 2) {
+  const posCamera = camera.position.clone();
+  const dirCamera = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw)).normalize();
+
+  arvores.forEach(arvore => {
+    const dirParaArvore = new THREE.Vector3(arvore.x, 0, arvore.z).sub(posCamera).setY(0).normalize();
+    const angulo = dirCamera.angleTo(dirParaArvore);
+    const visivel = angulo <= anguloVisao / 2;
+
+    arvore.blocos.forEach(bloco => {
+      if (bloco && bloco.mesh) bloco.mesh.visible = visivel;
+    });
+  });
+}
+
+// Gera as árvores uma vez
+gerarArvoresEspalhadas(60, 600, 40);
+
+// No loop de animação do jogo, adicione:
+function animate() {
+  requestAnimationFrame(animate);
+
+  // ... outros códigos do jogo ...
+
+  atualizarVisibilidadeArvores(Math.PI / 2); // 90° de visão
+
+  renderer.render(scene, camera);
+}
+
+
+
+*/
+
+
+
+
+
+
+
+
+
+// ==== CRIAÇÃO DO INIMIGO QUADRÚPEDE ave vaca ====
+
+//let enemy = null;
+
+function createEnemy() {
+  const enemy = new THREE.Group();
+
+  // Corpo
+  const bodyGeo = new THREE.BoxGeometry(0, 0, 0); // (1.3, 0.3, 1);
+  const bodyMat = new THREE.MeshStandardMaterial({ color: 0xff3333 });
+  const body = new THREE.Mesh(bodyGeo, bodyMat);
+  enemy.add(body);
+
+  // Pernas
+  const legGeo = new THREE.BoxGeometry(0, 0, 0); //( 0.2, 0.5, 0.2);
+  const legMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+
+  const legs = [];
+
+  const positions = [
+   // [-0.4, -0.75,  0.4], // frente esquerda
+    [ 0.4, -0.75,  0.4], // frente direita
+  //  [-0.4, -0.75, -0.4], // trás esquerda
+    [ 0.4, -0.75, -0.4]  // trás direita
+  ];
+
+  positions.forEach(pos => {
+    const leg = new THREE.Mesh(legGeo, legMat);
+    leg.position.set(...pos);
+    legs.push(leg);
+    enemy.add(leg);
+  });
+
+  enemy.userData.legs = legs;
+  enemy.position.set(20, 20, 0);
+  world.add(enemy);
+  return enemy;
+}
+
+// ==== INICIALIZAÇÃO COM ATRASO ====
+
+setTimeout(() => {
+  enemy = createEnemy();
+}, 100000000000000000000000000); // aparece após 5 segundos
+
+// ==== LOOP DE ANIMAÇÃO ====
+
+
+
+
+
+
+
+
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const step = 0.1;
+      idleTime += 0.03;
+
+
+
+
+
+
+
+
+
+// Animação das vaquinhas
+function animarVaquinhas() {
+  vaquinhas.forEach(vaca => {
+    const data = vaca.userData;
+    const destino = data.destino;
+
+    if (data.esperando) {
+      data.esperaTimer -= 1;
+      if (data.esperaTimer <= 0) {
+        data.esperando = false;
+        data.destino = gerarDestinoAleatorio();
+      }
+      return;
+    }
+
+    const pos = vaca.position;
+    const dir = new THREE.Vector3().subVectors(destino, pos);
+    const dist = dir.length();
+
+    if (dist < 0.1) {
+      data.esperando = true;
+      data.esperaTimer = 100 + Math.floor(Math.random() * 100);
+      return;
+    }
+
+    dir.normalize();
+    vaca.position.addScaledVector(dir, 0.03);
+
+    // Animação das patas
+    data.passo += data.sentido * 0.1;
+    if (data.passo > 0.4 || data.passo < -0.4) data.sentido *= -1;
+
+    data.pernas[0].rotation.x = data.passo;
+    data.pernas[1].rotation.x = -data.passo;
+    data.pernas[2].rotation.x = -data.passo;
+    data.pernas[3].rotation.x = data.passo;
+  });
+}
+
+
+
+
+  
+  animarVaquinhas();
+  
+
+
+
+
+
+
+
+
+// animação vaca
+
+  if (enemy) {
+    // Movimento lateral
+    enemy.position.x += 0.01;
+
+    // Animação das pernas
+    enemy.userData.legs.forEach((leg, i) => {
+      leg.rotation.x = Math.sin(Date.now() * 0.005 + i) * 0.5;
+    });
+  }
+
+  
+
+
+
+      // animação do personagem
+      const andando = Object.values(direcoesAtivas).some(v => v);
+      if (andando) {
+        const runSpeed = idleTime * 2.5;
+        body.position.y = 1.5 + Math.sin(runSpeed) * 0.08;
+        head.rotation.y = Math.sin(runSpeed * 0.5) * 0.1;
+        armL.rotation.z = Math.sin(runSpeed * 2) * 0.4;
+        armR.rotation.z = -Math.sin(runSpeed * 2) * 0.4;
+        legL.rotation.x = Math.sin(runSpeed * 2) * 0.4;
+        legR.rotation.x = -Math.sin(runSpeed * 2) * 0.4;
+      } else {
+        body.position.y = 1.5 + Math.sin(idleTime) * 0.05;
+        head.rotation.y = Math.sin(idleTime * 0.5) * 0.1;
+        armL.rotation.z = Math.sin(idleTime * 1.5) * 0.1;
+        armR.rotation.z = -Math.sin(idleTime * 1.5) * 0.1;
+        legL.rotation.x = Math.sin(idleTime * 0.8) * 0.02;
+        legR.rotation.x = -Math.sin(idleTime * 0.8) * 0.02;
+      }
+
+      const direction = new THREE.Vector3(
+        Math.sin(yaw) * Math.cos(pitch),
+        Math.sin(pitch),
+        Math.cos(yaw) * Math.cos(pitch)
+      );
+      camera.lookAt(camera.position.clone().add(direction));
+
+      const moveVector = new THREE.Vector3();
+      if (direcoesAtivas.backward) moveVector.z -= 1;
+      if (direcoesAtivas.forward) moveVector.z += 1;
+      if (direcoesAtivas.right) moveVector.x -= 1;
+      if (direcoesAtivas.left) moveVector.x += 1;
+
+      if (moveVector.length() > 0) {
+        moveVector.normalize();
+        moveVector.applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+        world.position.sub(moveVector.multiplyScalar(step));
+      }
+
+      if (rotating) world.rotation.y += 0.02;
+
+      if (isJumping) {
+        velocityY += gravity;
+        world.position.y += velocityY;
+
+        let landed = false;
+        cubes.forEach(cube => {
+          const dx = Math.abs(camera.position.x - cube.position.x - world.position.x);
+          const dz = Math.abs(camera.position.z - cube.position.z - world.position.z);
+          const dy = -world.position.y - cube.position.y;
+          if (dx < 1 && dz < 1 && dy > 0 && dy < 1) {
+           // world.position.y = -cube.position
+
+
+
+
+
+
+
+world.position.y = -cube.position.y - 1;
+            velocityY = 0;
+            isJumping = false;
+            landed = true;
+          }
+        });
+
+        if (!landed && world.position.y >= -1.4) {
+          world.position.y = -1.4;
+          velocityY = 0;
+          isJumping = false;
+        }
+      }
+
+      // ✅ CORREÇÃO: queda automática ao sair de blocos
+      if (!isJumping) {
+        let onCube = false;
+        cubes.forEach(cube => {
+          const dx = Math.abs(camera.position.x - cube.position.x - world.position.x);
+          const dz = Math.abs(camera.position.z - cube.position.z - world.position.z);
+          const dy = -world.position.y - cube.position.y;
+          if (dx < 1 && dz < 1 && Math.abs(dy - 1) < 0.1) {
+            onCube = true;
+          }
+        });
+        if (!onCube && world.position.y < -1.4) {
+          isJumping = true;
+          velocityY = 0;
+        }
+      }
+
+
+
+      // Atualiza posição do braço ou personagem
+// braço segue a câmera 
+if (isSphere && armMesh) {
+  const offset = new THREE.Vector3(0.7, -0.5, -1.3);
+  const armPosition = offset.clone().applyQuaternion(camera.quaternion);
+  armMesh.position.copy(camera.position.clone().add(armPosition));
+
+  // Faz o braço herdar a rotação da câmera
+  armMesh.quaternion.copy(camera.quaternion);
+
+
+//braço fixo 
+   /*   if (isSphere && armMesh) {
+        const offset = new THREE.Vector3(-0.7, -0.5, 0.3);
+        const armPosition = offset.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+        armMesh.position.copy(camera.position.clone().add(armPosition));
+        armMesh.rotation.set(0, yaw, 3);*/
+      } else {
+        const offset = new THREE.Vector3(-0.4, -1.9, 5);
+        const rotatedOffset = offset.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+        characterr.position.copy(camera.position.clone().add(rotatedOffset));
+        characterr.rotation.y = yaw;
+      }
+
+      // Atualiza projéteis
+      for (let i = bullets.length - 1; i >= 0; i--) {
+        const b = bullets[i];
+        b.mesh.position.addScaledVector(b.direction, bulletSpeed);
+        if (b.mesh.position.distanceTo(camera.position) > 100) {
+          scene.remove(b.mesh);
+          bullets.splice(i, 1);
+        }
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
