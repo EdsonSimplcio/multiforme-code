@@ -2090,6 +2090,79 @@ coresRemovidas.push(cor);
 
 
 
+      
+
+/*
+🎤🎤🎤🎙️🎙️🎙️📻📝✏️✏️✏️✏️✏️✏️📢📢📢📢
+
+
+🎤🎤🎤🎤🎤🎙️🎙️📻🎙️🎙️✏️✏️✏️✏️✏️📢📢📢📢
+*/
+// Criar botão "Chat"
+const chatBtn = document.createElement("button");
+chatBtn.innerText = "💬 Chat";
+chatBtn.style.position = "fixed";
+chatBtn.style.top = "60px";
+chatBtn.style.right = "10px";
+chatBtn.style.zIndex = "1000";
+chatBtn.style.padding = "8px 12px";
+chatBtn.style.background = "#0084ff";
+chatBtn.style.color = "white";
+chatBtn.style.border = "none";
+chatBtn.style.borderRadius = "6px";
+chatBtn.style.cursor = "pointer";
+
+let chatWin; // variável para guardar a janela
+
+chatBtn.onclick = () => {
+  if (!chatWin) {
+    chatWin = document.createElement("iframe");
+    chatWin.src = "https://edsonsimplcio.github.io/Meu-jogo-multiplayer-/";
+    chatWin.style.position = "fixed";
+    chatWin.style.top = "10px";
+    chatWin.style.left = "10px";
+    chatWin.style.width = "300px";
+    chatWin.style.height = "200px";
+    chatWin.style.border = "2px solid #444";
+    chatWin.style.borderRadius = "8px";
+    chatWin.style.zIndex = "1001";
+    chatWin.style.backgroundColor = "transparent";
+    chatWin.style.opacity = "0.7"; // translúcido
+
+    document.body.appendChild(chatWin);
+
+    // Botão aumentar
+    const biggerBtn = document.createElement("button");
+    biggerBtn.innerText = "➕";
+    biggerBtn.style.position = "fixed";
+    biggerBtn.style.top = "10px";
+    biggerBtn.style.left = "320px";
+    biggerBtn.style.zIndex = "1002";
+    biggerBtn.onclick = () => {
+      chatWin.style.width = (parseInt(chatWin.style.width) + 50) + "px";
+      chatWin.style.height = (parseInt(chatWin.style.height) + 30) + "px";
+    };
+    document.body.appendChild(biggerBtn);
+
+    // Botão diminuir
+    const smallerBtn = document.createElement("button");
+    smallerBtn.innerText = "➖";
+    smallerBtn.style.position = "fixed";
+    smallerBtn.style.top = "40px";
+    smallerBtn.style.left = "320px";
+    smallerBtn.style.zIndex = "1002";
+    smallerBtn.onclick = () => {
+      chatWin.style.width = (parseInt(chatWin.style.width) - 50) + "px";
+      chatWin.style.height = (parseInt(chatWin.style.height) - 30) + "px";
+    };
+    document.body.appendChild(smallerBtn);
+  }
+};
+
+document.body.appendChild(chatBtn);
+
+
+
 
 
 
