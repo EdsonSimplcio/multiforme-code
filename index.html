@@ -2,9 +2,10 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Multiplayer Cubos 3D</title>
+  <title>Multiplayer Quadrados 2D</title>
   <style>
-    body { margin:0; overflow:hidden; background:#111; }
+    body { margin:0; background:#111; }
+    canvas { display:block; background:#222; }
     #controls {
       position: fixed;
       bottom: 20px;
@@ -27,6 +28,8 @@
   </style>
 </head>
 <body>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+
   <!-- Botões virtuais -->
   <div id="controls">
     <div class="empty"></div>
@@ -41,85 +44,68 @@
   </div>
 
   <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
 
   <script>
-    const socket = io(); // conecta ao mesmo servidor
+    const socket = io();
 
-    let currentRoom = null;
+    let currentRoom = prompt("Digite o nome da sala:");
     let username = prompt("Digite seu nome:");
-    currentRoom = prompt("Digite o nome da sala:");
-    const senha = prompt("Digite a senha da sala:");
+    let senha = prompt("Digite a senha da sala:");
 
-    // tenta entrar na sala
     socket.emit("joinRoom", { room: currentRoom, password: senha, user: username });
 
-    let scene, camera, renderer;
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
     let players = {};
-    let myCube;
+    let myPlayer = { x: 400, y: 300, color: "lime" };
 
-    function iniciar3D() {
-      scene = new THREE.Scene();
-      camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-      renderer = new THREE.WebGLRenderer();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      document.body.appendChild(renderer.domElement);
+    function draw() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
 
-      camera.position.z = 5;
+      // desenha meu quadrado
+      ctx.fillStyle = myPlayer.color;
+      ctx.fillRect(myPlayer.x, myPlayer.y, 30, 30);
 
-      const light = new THREE.PointLight(0xffffff, 1);
-      light.position.set(5,5,5);
-      scene.add(light);
-
-      const geometry = new THREE.BoxGeometry(1,1,1);
-      const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-      myCube = new THREE.Mesh(geometry, material);
-      scene.add(myCube);
-
-      window.addEventListener("keydown", (e) => moverCubo(e.key));
-      document.getElementById("up").onclick = () => moverCubo("ArrowUp");
-      document.getElementById("down").onclick = () => moverCubo("ArrowDown");
-      document.getElementById("left").onclick = () => moverCubo("ArrowLeft");
-      document.getElementById("right").onclick = () => moverCubo("ArrowRight");
-
-      animate();
-    }
-
-    function moverCubo(key) {
-      if (!myCube) return;
-      switch(key) {
-        case "ArrowUp": myCube.position.y += 0.1; break;
-        case "ArrowDown": myCube.position.y -= 0.1; break;
-        case "ArrowLeft": myCube.position.x -= 0.1; break;
-        case "ArrowRight": myCube.position.x += 0.1; break;
+      // desenha outros jogadores
+      for (let id in players) {
+        const p = players[id];
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, 30, 30);
       }
-      socket.emit("playerUpdate", { room: currentRoom, x: myCube.position.x, y: myCube.position.y, z: myCube.position.z });
+
+      requestAnimationFrame(draw);
     }
 
-    function animate() {
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
+    function mover(key) {
+      switch(key) {
+        case "ArrowUp": myPlayer.y -= 10; break;
+        case "ArrowDown": myPlayer.y += 10; break;
+        case "ArrowLeft": myPlayer.x -= 10; break;
+        case "ArrowRight": myPlayer.x += 10; break;
+      }
+      socket.emit("playerUpdate", { room: currentRoom, x: myPlayer.x, y: myPlayer.y, z: 0 });
     }
+
+    window.addEventListener("keydown", (e) => mover(e.key));
+    document.getElementById("up").onclick = () => mover("ArrowUp");
+    document.getElementById("down").onclick = () => mover("ArrowDown");
+    document.getElementById("left").onclick = () => mover("ArrowLeft");
+    document.getElementById("right").onclick = () => mover("ArrowRight");
 
     socket.on("playerUpdate", (data) => {
       if (!players[data.id]) {
-        const geometry = new THREE.BoxGeometry(1,1,1);
-        const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-        const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
-        players[data.id] = cube;
+        players[data.id] = { x: data.x, y: data.y, color: "red" };
       }
-      players[data.id].position.set(data.x, data.y, data.z);
+      players[data.id].x = data.x;
+      players[data.id].y = data.y;
     });
 
     socket.on("playerDisconnect", (id) => {
-      if (players[id]) {
-        scene.remove(players[id]);
-        delete players[id];
-      }
+      delete players[id];
     });
 
-    iniciar3D();
+    draw();
   </script>
 </body>
 </html>
