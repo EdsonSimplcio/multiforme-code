@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Multiplayer Cubos 3D</title>
+  <style>
+    body { margin:0; overflow:hidden; background:#111; }
+    #controls {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: grid;
+      grid-template-columns: 60px 60px 60px;
+      grid-template-rows: 60px 60px 60px;
+      gap: 5px;
+      z-index: 1000;
+    }
+    #controls button {
+      background: #0084ff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    #controls .empty { background: transparent; cursor: default; }
+  </style>
+</head>
+<body>
+  <!-- Botões virtuais -->
+  <div id="controls">
+    <div class="empty"></div>
+    <button id="up">⬆️</button>
+    <div class="empty"></div>
+    <button id="left">⬅️</button>
+    <div class="empty"></div>
+    <button id="right">➡️</button>
+    <div class="empty"></div>
+    <button id="down">⬇️</button>
+    <div class="empty"></div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+
+  <script>
+    const socket = io(); // conecta ao mesmo servidor
+
+    let currentRoom = null;
+    let username = prompt("Digite seu nome:");
+    currentRoom = prompt("Digite o nome da sala:");
+    const senha = prompt("Digite a senha da sala:");
+
+    // tenta entrar na sala
+    socket.emit("joinRoom", { room: currentRoom, password: senha, user: username });
+
+    let scene, camera, renderer;
+    let players = {};
+    let myCube;
+
+    function iniciar3D() {
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+      renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      camera.position.z = 5;
+
+      const light = new THREE.PointLight(0xffffff, 1);
+      light.position.set(5,5,5);
+      scene.add(light);
+
+      const geometry = new THREE.BoxGeometry(1,1,1);
+      const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+      myCube = new THREE.Mesh(geometry, material);
+      scene.add(myCube);
+
+      window.addEventListener("keydown", (e) => moverCubo(e.key));
+      document.getElementById("up").onclick = () => moverCubo("ArrowUp");
+      document.getElementById("down").onclick = () => moverCubo("ArrowDown");
+      document.getElementById("left").onclick = () => moverCubo("ArrowLeft");
+      document.getElementById("right").onclick = () => moverCubo("ArrowRight");
+
+      animate();
+    }
+
+    function moverCubo(key) {
+      if (!myCube) return;
+      switch(key) {
+        case "ArrowUp": myCube.position.y += 0.1; break;
+        case "ArrowDown": myCube.position.y -= 0.1; break;
+        case "ArrowLeft": myCube.position.x -= 0.1; break;
+        case "ArrowRight": myCube.position.x += 0.1; break;
+      }
+      socket.emit("playerUpdate", { room: currentRoom, x: myCube.position.x, y: myCube.position.y, z: myCube.position.z });
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+
+    socket.on("playerUpdate", (data) => {
+      if (!players[data.id]) {
+        const geometry = new THREE.BoxGeometry(1,1,1);
+        const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+        players[data.id] = cube;
+      }
+      players[data.id].position.set(data.x, data.y, data.z);
+    });
+
+    socket.on("playerDisconnect", (id) => {
+      if (players[id]) {
+        scene.remove(players[id]);
+        delete players[id];
+      }
+    });
+
+    iniciar3D();
+  </script>
+</body>
+</html>
