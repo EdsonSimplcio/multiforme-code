@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Multiplayer 2D com Arrastar</title>
+  <style>
+    body { margin:0; background:#111; }
+    canvas { display:block; background:#222; touch-action:none; }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script>
+    const socket = io();
+
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let players = {};
+    let myPlayer = { x: 400, y: 300, color: "lime" };
+
+    function draw() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      // meu quadrado
+      ctx.fillStyle = myPlayer.color;
+      ctx.fillRect(myPlayer.x, myPlayer.y, 30, 30);
+
+      // outros jogadores
+      for (let id in players) {
+        const p = players[id];
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, 30, 30);
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    // arrastar com o dedo
+    let dragging = false;
+    canvas.addEventListener("touchstart", (e) => {
+      dragging = true;
+    });
+
+    canvas.addEventListener("touchmove", (e) => {
+      if (!dragging) return;
+      const touch = e.touches[0];
+      // posição relativa ao canvas
+      const rect = canvas.getBoundingClientRect();
+      myPlayer.x = touch.clientX - rect.left - 15;
+      myPlayer.y = touch.clientY - rect.top - 15;
+      socket.emit("playerUpdate", { x: myPlayer.x, y: myPlayer.y });
+    });
+
+    canvas.addEventListener("touchend", () => {
+      dragging = false;
+    });
+
+    // também funciona com mouse (PC)
+    canvas.addEventListener("mousedown", (e) => {
+      dragging = true;
+    });
+    canvas.addEventListener("mousemove", (e) => {
+      if (!dragging) return;
+      const rect = canvas.getBoundingClientRect();
+      myPlayer.x = e.clientX - rect.left - 15;
+      myPlayer.y = e.clientY - rect.top - 15;
+      socket.emit("playerUpdate", { x: myPlayer.x, y: myPlayer.y });
+    });
+    canvas.addEventListener("mouseup", () => {
+      dragging = false;
+    });
+
+    // atualizações dos outros jogadores
+    socket.on("playerUpdate", (data) => {
+      if (data.id !== socket.id) {
+        if (!players[data.id]) {
+          players[data.id] = { x: data.x, y: data.y, color: "red" };
+        }
+        players[data.id].x = data.x;
+        players[data.id].y = data.y;
+      }
+    });
+
+    socket.on("playerDisconnect", (id) => {
+      delete players[id];
+    });
+
+    draw();
+  </script>
+</body>
+</html>
