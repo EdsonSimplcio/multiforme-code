@@ -1,0 +1,2192 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Orkut - Clone Anos 2000 Ultimate</title>
+    <style>
+        /* Estilos Orkut anos 2000 */
+        body { font-family: 'Tahoma', sans-serif; background-color: #7992B6; margin: 0; padding: 0; font-size: 12px; }
+        .header { background-color: #4E688D; color: white; padding: 5px 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #334b6c; }
+        .logo { font-size: 24px; font-weight: bold; color: #FFCC00; text-decoration: none; }
+        .top-nav { display: flex; align-items: center; gap: 10px; color: white; }
+        .top-nav a { color: white; text-decoration: none; }
+        
+        /* Caixa de Código Secreto */
+        .admin-code-top { display: flex; align-items: center; gap: 4px; margin-left: 15px; background: #3b5272; padding: 3px 6px; border-radius: 3px; border: 1px dashed #FFCC00; }
+        .admin-code-top label { font-size: 10px; font-weight: bold; color: #FFCC00; }
+        .admin-code-top input { width: 80px; height: 16px; font-size: 11px; border: 1px solid #ccc; padding: 1px 3px; }
+        .admin-code-top button { height: 20px; font-size: 10px; cursor: pointer; font-weight: bold; background: #fff; border: 1px solid #999; }
+
+        .container { display: flex; width: 960px; margin: 10px auto; background-color: #fff; border: 1px solid #999; position: relative; }
+        
+        /* Colunas */
+        .col-left { width: 200px; padding: 10px; border-right: 1px solid #ccc; text-align: center; }
+        .profile-img { width: 150px; height: 150px; background-color: #ddd; margin-bottom: 10px; border: 2px solid #4E688D; }
+        .menu-links { text-align: left; position: relative; }
+        .menu-links a { display: block; color: #003399; text-decoration: none; margin: 5px 0; font-weight: bold; }
+        
+        /* Sistema de botões e Menu Suspenso */
+        .more-games-btn { background: #4E688D; color: white; border: none; padding: 3px 8px; font-size: 11px; font-weight: bold; cursor: pointer; border-radius: 3px; margin-top: 4px; width: 80px; display: block; text-align: center; }
+        .config-btn { background: #2e7d32; color: white; border: none; padding: 3px 8px; font-size: 11px; font-weight: bold; cursor: pointer; border-radius: 3px; margin-top: 6px; width: 80px; display: block; text-align: center; }
+        .dropdown-games { display: none; position: absolute; left: 0; background: #fff; border: 1px solid #999; box-shadow: 2px 2px 8px rgba(0,0,0,0.2); z-index: 500; width: 130px; }
+        .dropdown-games div { padding: 5px 8px; color: #003399; font-weight: bold; cursor: pointer; }
+        .dropdown-games div:hover { background: #e1f5fe; }
+          
+        .col-center { flex: 1; padding: 10px; }
+        .profile-name { font-size: 18px; color: #003399; font-weight: bold; }
+        .tabs { border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 5px; }
+        .info-box { background-color: #f0f0f0; padding: 10px; border: 1px solid #ccc; margin-bottom: 10px; }
+        
+    /*novas comunidades*/
+        .col-right4 { width: 200px; padding: 10px; border-left: 1px solid #ccc; }
+        .box-title4 { font-weight: bold; color: #003399; margin-bottom: 5px; margin-top: 10px; border-bottom: 1px dashed #ccc; padding-bottom: 2px; }    
+    .grid-44 {     display: grid;     grid-template-columns: repeat(3, 1fr );/* Cria 6 colunas de larguras iguais*/     gap: 5px;     margin-bottom: 15px; }  
+   /* .grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 15px; }*/
+        .item-card4 { text-align: center; cursor: pointer; }
+        .item-img4 { width: 60px; height: 60px; background-color: #ddd; margin: 0 auto; border-radius: 4px; border: 1px solid #bbb; overflow: hidden; }
+        .item-img img4 { width: 100%; height: 100%; object-fit: cover; }
+        .item-name4 { font-size: 10px; color: #003399; margin-top: 2px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+     /*fim*/
+       
+        .col-right { width: 200px; padding: 10px; border-left: 1px solid #ccc; }
+        .box-title { font-weight: bold; color: #003399; margin-bottom: 5px; margin-top: 10px; border-bottom: 1px dashed #ccc; padding-bottom: 2px; }        
+        .grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 15px; }
+        .item-card { text-align: center; cursor: pointer; }
+        .item-img { width: 60px; height: 60px; background-color: #ddd; margin: 0 auto; border-radius: 4px; border: 1px solid #bbb; overflow: hidden; }
+        .item-img img { width: 100%; height: 100%; object-fit: cover; }
+        .item-name { font-size: 10px; color: #003399; margin-top: 2px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+
+        /* Caixa de Chat Online */
+        .live-chat-dock { position: fixed; bottom: 0; right: 10px; width: 320px; height: 380px; background: #fff; border: 2px solid #4E688D; border-radius: 6px 6px 0 0; box-shadow: -2px 2px 15px rgba(0,0,0,0.3); z-index: 2500; display: flex; flex-direction: column; overflow: hidden; transition: height 0.2s ease-in-out; }
+        .live-chat-dock.minimized { height: 30px; cursor: pointer; }
+        .live-chat-dock-header { background: #4E688D; color: white; padding: 6px 10px; font-weight: bold; font-size: 11px; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+        .live-chat-body { flex: 1; background: transparent; }
+
+        /* Janela de Antivírus */
+        .antivirus-dock { position: fixed; bottom: -200px; left: 10px; width: 280px; background: #fff; border: 2px solid #2e7d32; border-radius: 6px 6px 0 0; box-shadow: 2px -2px 15px rgba(0,0,0,0.3); z-index: 3100; display: flex; flex-direction: column; transition: bottom 0.3s ease-out; font-family: 'Tahoma', sans-serif; }
+        .antivirus-dock.active { bottom: 0; }
+        .antivirus-header { background: #2e7d32; color: white; padding: 6px 10px; font-weight: bold; font-size: 11px; display: flex; justify-content: space-between; align-items: center; }
+        .antivirus-body { padding: 10px; background: #f1f8e9; text-align: center; }
+        .antivirus-body input { width: 80%; padding: 4px; margin: 6px 0; border: 1px solid #2e7d32; font-family: 'Tahoma'; font-size: 11px; text-align: center; }
+        .antivirus-body button { background: #2e7d32; color: white; border: none; padding: 4px 12px; font-weight: bold; cursor: pointer; border-radius: 2px; }
+        .antivirus-body button:hover { background: #1b5e20; }
+
+        /* Modais */
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 980px; height: 480px; background: white; border: 2px solid #4E688D; z-index: 1000; }
+        .modal-header { background: #4E688D; color: white; padding: 5px; display: flex; justify-content: space-between; font-weight: bold; }
+        .modal-content { padding: 15px; height: calc(100% - 40px); overflow-y: auto; box-sizing: border-box; }
+        .close-btn { cursor: pointer; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+
+        /* Estilo da Lista do Painel Config */
+        .config-list { list-style: none; padding: 0; margin: 15px 0; }
+        .config-list li { margin: 12px 0; padding: 8px; background: #f5f5f5; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+        .config-list button { background: #4E688D; color: white; border: none; padding: 4px 10px; font-weight: bold; cursor: pointer; border-radius: 3px; }
+
+        /* Janela de Vírus Perigosa */
+        .virus-modal { display: none; position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%); width: 440px; background: #f0f0f0; border: 3px solid #d32f2f; z-index: 3000; box-shadow: 5px 5px 25px rgba(0,0,0,0.6); font-family: 'Courier New', monospace; }
+        .virus-header { background: #d32f2f; color: white; padding: 6px; display: flex; justify-content: space-between; font-weight: bold; }
+        .virus-content { padding: 20px; text-align: center; color: #333; }
+        
+        /* Animação de Tremor */
+        .shake-animation { animation: tremor 0.1s infinite alternate; }
+        @keyframes tremor { 0% { transform: translate(-51%, -49%) rotate(0.5deg); } 100% { transform: translate(-49%, -51%) rotate(-0.5deg); } }
+
+        /* Aquário */
+        #aquarium-tank { position: relative; width: 600px; height: 300px; background: #e0f7fa; border: 5px solid #00acc1; border-radius: 10px; margin: 0 auto; overflow: hidden; cursor: crosshair; }
+        .fish { position: absolute; font-size: 24px; transition: all 0.6s ease-out; user-select: none; }
+        .food { position: absolute; font-size: 14px; width: 10px; height: 10px; background: #8d6e63; border-radius: 50%; }
+
+        /* Chats Internos */
+        .friend-chat-container { display: flex; flex-direction: column; height: 100%; }
+        .friend-chat-messages { flex: 1; border: 1px solid #ccc; background: #fdfdfd; padding: 10px; overflow-y: auto; min-height: 180px; text-align: left; }
+        .friend-chat-input-area { margin-top: 10px; display: flex; gap: 10px; align-items: center; }
+        .friend-chat-input-area input { flex: 1; padding: 5px; font-family: Tahoma; }
+        .friend-chat-input-area button { padding: 5px 15px; font-weight: bold; cursor: pointer; }
+        .msg-line { margin-bottom: 8px; font-size: 12px; }
+        .msg-line strong { color: #003399; }
+        .msg-line.system { color: #d32f2f; font-weight: bold; background: #ffebee; padding: 5px; border: 1px solid #c62828; border-radius: 3px; }
+        .status-link-alert { font-weight: bold; color: #e65100; margin-bottom: 10px; text-align: left; font-size: 11px; }
+    
+               
+    /* Garante que o corpo da página ocupe toda a tela e centralize o conteúdo */
+        bodyff {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center; /* Centraliza horizontalmente */
+            align-items: center;     /* Centraliza verticalmente */
+            background-color: #f0f2f5; /* Cor de fundo suave */
+            font-family: Arial, sans-serif;
+        }
+
+        /* Container principal em formato de coluna */
+        .container-coluna {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center; /* Centraliza horizontalmente */
+            align-items: center;     /* Centraliza verticalmente */
+            background-color: #f0f2f5; /* Cor de fundo suave */
+            font-family: Arial, sans-serif;
+
+            
+            display: flex;
+            flex-direction: column; /* Alinha os itens um embaixo do outro */
+            gap: 20px;              /* Espaçamento entre as imagens */
+            padding: 20px;
+            max-width: 100%;
+        }
+
+        /* Estilização dos links e das imagens */
+        .link-imagem {
+            display: block;
+            transition: transform 0.2s ease; /* Efeito suave ao passar o mouse */
+        }
+
+        .link-imagem:hover {
+            transform: scale(1.03); /* Esboco de zoom ao passar o mouse */
+        }
+
+        .link-imagem img {
+            width: 300px;           /* Largura padrão das imagens */
+            height: auto;           /* Mantém a proporção da imagem */
+            border-radius: 8px;     /* Bordas arredondadas */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra leve */
+            display: block;
+        }
+    
+    /* inpedir de copiar e colar */
+    #display-phrases-container {
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* Internet Explorer/Edge */
+    user-select: none;         /* Padrão moderno */
+}
+    
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="logo">bananada</div>
+    <div class="top-nav">
+        <a href="#">início</a> | <a href="#">perfil</a> | <a href="#">scrapbook</a>
+        <div class="admin-code-top">
+            <label>CÓDIGO:</label>
+            <input type="text" id="secretCodeInput" placeholder="Ex: link1">
+            <button onclick="checkSecretCode()">Enviar</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="col-left">
+        <div class="profile-img">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDkFckaqXwIXmBukscCy-SgctSZA1OHWlx5VOtg-kIXQ&s=10 "                 alt="Foto de Perfil" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+        </div>
+        <div class="menu-links">
+            <a href="#" onclick="openModal('modalFriend7')">Perfil</a>
+            <a href="#" onclick="openModal('modalFotos')">Fotos</a>
+            <a href="#" onclick="openModal('modalVideos')">Vídeos</a>
+            <a href="#" onclick="openModal('modalHobby')">Hobby</a>
+            
+            <div id="game-links-group">
+                <div onclick="openModal('modalFriend8')" style="margin-top: 5px; cursor: pointer;"><div style="color: #003399; font-weight: bold;">vacuuo (Colheita)</div></div>
+                <div onclick="openModal('modalAquario'); initAquarium();" style="margin-top: 5px; cursor: pointer;"><div style="color: #003399; font-weight: bold;">aquário</div></div>
+            </div>
+            
+            <button class="more-games-btn" onclick="toggleDropdown()">+ mais</button>
+            <div class="dropdown-games" id="gamesDropdown">
+                <div onclick="openModal('modalFriend8')">vacuuo</div>
+                <div onclick="openModal('modalAquario'); initAquarium();">aquario</div>
+            </div>
+            <button class="config-btn" onclick="openModal('modalConfig')">config</button>
+            
+            <button class="config-btn2" onclick="openModal('modalConfig2')">+</button>
+        
+
+            
+        </div>
+    </div>
+
+    <div class="col-center">
+        <div class="profile-name">Zé Fulano</div>
+        <div class="tabs"><a href="#">Fan(50)</a> | <a href="#">Sexy(10)</a></div>
+        <div class="info-box">
+            <p><strong>Link Ativo no Topo:</strong> <span id="active-link-status" style="color: #d32f2f; font-weight: bold;">Nenhum (Inativo)</span></p>
+            <p><strong>Status Game Vacuuo:</strong> <span id="status-vacuuo" style="font-weight:bold; color:red;">Pendente ❌</span></p>
+            <p><strong>Status Game Aquário:</strong> <span id="status-aquario" style="font-weight:bold; color:red;">Pendente ❌</span></p>
+            <p><strong>Status do Painel Config:</strong> <span id="status-config-tasks" style="font-weight:bold; color:red;">Pendentes (0/5) ❌</span></p>
+            <hr>
+            <p><strong>Segurança do Windows:</strong> <span id="status-seguranca" style="color: green; font-weight: bold;">Protegido🛡️</span></p>
+        </div>
+        
+        
+
+<div id="display-phrases-container" style="display: none; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin: 20px auto; max-width: 400px; text-align: left;">
+    <h3 style="margin-top: 0; color: #333; border-bottom: 2px solid #eee; padding-bottom: 5px;">
+        📌 Frases do Próximo Link:
+    </h3>
+    <ul id="display-phrases-list" style="list-style-type: disc; padding-left: 20px; color: #555; line-height: 1.6;">
+        </ul>
+</div>
+        
+        
+    </div>
+
+    <div class="col-right">
+        <div class="box-title">Amigos (4)</div>
+        <div class="grid-4">
+            <div class="item-card" onclick="openTargetProfile('modalFriend1', 'Maria')"><div class="item-img" style="background-color: #ffcdd2;">     <div class="item-img"> <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT93Db0NED0MuDpGJKBohUoF7TpGImtL2n4UMA_1L-LRA&s=10                "       style="width:60px;height:60px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">alt="Img"></div>        </div><div class="item-name">Maria</div></div>            
+            <div class="item-card" onclick="openTargetProfile('modalFriend2', 'toin')"><div class="item-img" style="background-color: #e1bee7;">    <div class="item-img"> <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRD5RHRGRL9dmQW5L6bN1CGzMG2d0Z8PTqMf-l29RJfhQ&s=10"                style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">alt="Img"></div>          </div><div class="item-name">Toin</div></div>
+             <div class="item-card" onclick="openTargetProfile('modalFriend3', 'Ana')"><div class="item-img" style="background-color: #e1bee5;">    <div class="item-img"> <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfTlVRUk87GIN6VWJ80gEquJoZsRBgW9ebiL6lR8JhRA&s=10 "  style="width:60px;height:60px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">alt="Img"></div>          </div><div class="item-name">Ana</div></div>
+             <div class="item-card" onclick="openTargetProfile('modalFriend4', 'lucas')"><div class="item-img" style="background-color: #e1bee5;">    <div class="item-img"> <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqzONfnxjqJWdABNTXAxAldHS3pgbZYDYVMZsucwO-5A&s=10                       "  style="width:65px;height:65px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">alt="Img"></div>          </div><div class="item-name">Lucas</div></div>
+            
+            
+                      <!-- <div class="item-card" onclick="openTargetProfile('modalFriend3', 'Ana')"><div class="item-img" style="background-color: #b3e5fc;"></div><div class="item-name">Ana</div></div>-->
+            <!--<div class="item-card" onclick="openTargetProfile('modalFriend4', 'Lucas')"><div class="item-img" style="background-color: #c8e6c9;"></div><div class="item-name">Lucas</div></div>-->
+        </div>
+
+        <div class="box-title">Comunidades (11)<button class="config-btn2" onclick="openModal('modalConfig2')">+</button>
+        </div>
+        <div class="grid-4">
+            <div class="item-card" onclick="openTargetProfile('modalComunidade1', 'OdeioAcordarCedo')">
+                <div class="item-img"> <img src="https://raw.githubusercontent.com/EdsonSimplcio/Bananada/refs/heads/main/Colecionador.jpg" style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">alt="Img"></div>
+                <div class="item-name">Pobre colecionador</div>
+            </div>
+            <div class="item-card" onclick="openTargetProfile('modalComunidade2', 'LoucosPorCodigo')">
+                <div class="item-img"><img src="https://raw.githubusercontent.com/EdsonSimplcio/Bananada/refs/heads/main/pessoasnovacuo.jpg" alt="Img"></div>
+                <div class="item-name">Já fiquei no vácuo</div>
+            </div>
+            <div class="item-card" onclick="openTargetProfile('modalComunidade3', 'Escondidinho')">
+                <div class="item-img"><img src="https://i.imgur.com/46uoC6L.jpeg" alt="Img"></div>
+                <div class="item-name">Já vai ta</div>
+            </div>
+            <div class="item-card" onclick="openTargetProfile('modalComunidade4', 'ForumAntivirus')">
+                <div class="item-img"><img src="https://i.imgur.com/46uoC6L.jpeg" alt="Img"></div>
+                <div class="item-name">Já usei os 3 segundos</div>
+            </div>
+        </div>
+    </div>
+</div>
+              
+<div class="modal" id="modalConfig">
+    <div class="modal-header"><span>Painel Config - Mini Games Tasks</span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">
+        <h3>Selecione e complete as tarefas extras do sistema:</h3>
+        <ul class="config-list">
+            <li>
+                <span><strong>Slingshot Game (Estilingue)</strong> - Status: <span id="task-slingshot" style="color:red; font-weight:bold;">Pendente ❌</span></span>
+                <button onclick="abrirSlingshotGame()">Jogar</button>
+            </li>
+            <li>
+                <span><strong>Velocímetro Game</strong> - Status: <span id="task-velocimetro" style="color:red; font-weight:bold;">Pendente ❌</span></span>
+                <button onclick="abrirVelocimetroGame()">Jogar</button>
+            </li>
+            <li>
+                <span><strong>Virus Game (Desviar e Defender)</strong> - Status: <span id="task-virus" style="color:red; font-weight:bold;">Pendente ❌</span></span>
+                <button onclick="abrirVirusGame()">Jogar</button>
+            </li>
+            <li>
+                <span><strong>Jogo de Plataforma 2D</strong> - Status: <span id="task-jogo2d" style="color:red; font-weight:bold;">Pendente ❌</span></span>
+                <button onclick="abrirPerfilJogo()">Jogar</button>
+            </li>
+            <li>
+                <span><strong>Captcha Animal Game</strong> - Status: <span id="task-captcha" style="color:red; font-weight:bold;">Pendente ❌</span></span>
+                <button onclick="abrirCaptchaGame()">Jogar</button>
+            </li>
+        </ul>
+    </div>
+</div>
+    
+    
+    
+    
+    
+    <div class="modal" id="modalConfig2">
+    <div class="modal-header"><span>Painel Config - Mini Games Tasks</span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">
+        <h3>Selecione e complete as tarefas extras do sistema:</h3>
+        <ul class="config-list">
+          
+            
+
+            <!-- novas comunidades-->
+                
+                <div class="box-title">Comunidades (11)</div>
+        <div class="grid-44">
+            
+            
+           <div class="item-card" onclick="openTargetProfile('modalComunidade13', 'OdeioAcordarCedo')">
+                <div class="item-img"> <img src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcSqoeCXVELGNa8nXRKPWgtjfZqPLsC0cyJpS_fpyPVF3-9sPGLf" style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">alt="Img"></div>
+                <div class="item-name">Amigo útil</div>
+            </div>       
+            
+            <div class="modal" id="modalComunidade13">
+    <div class="modal-header"><span>Fórum:  Amizade verdadeira é quando o amigo é verdadeiramente útil </span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">        
+        <img src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcSqoeCXVELGNa8nXRKPWgtjfZqPLsC0cyJpS_fpyPVF3-9sPGLf" style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">         
+        <span style="font-size: 20px; font-weight: bold; color: #003399;">  Amizade verdadeira é quando o amigo é verdadeiramente útil</span>
+        
+     <div  style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"><span style="margin-right: 250px;"><b>Idioma:</b> Português (Brasil)</span><span style="margin-right: 30px;"><b>criado em:</b>09/04/2004</span>
+      <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"> <span style="margin-right: 250px;">     <b>Tipo:</b>Arte e entretenimento </span><span style="margin-right: 30px;"><b>local:</b> Brasil</span> </div>
+         <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"><span style="margin-right: 250px;"> <b>Moderadores:</b>Beltrano cid</span><span style="margin-right: 30px;"><b>Proprietário:</b> Cicrano</span> </div>      
+<div style="font-size: 14px; font-weight: bold; color: #333;"> <span style="margin-right: 250px;"><p></p> Amigo é coisa para se guardar debaixo de 7 chaves". ouviste a poeisa, Amigo é coisa, é um objeto, e muito útil. Tá tudo alagado por causa da chuva e precisa atravesar A calçada alta para a outra calçada? Use o amigo como ponte. Precisa desce uma ribanceira? Use o amigo como prancha de snowboard ou skinbunda. aqui  sua amizades será bem usada, seu útil.  </span></div>
+ <p></!--Amigo> </p></div>
+                
+        <div style="clear:both;"></div>               
+        <div id="link-alert-OdeioAcordarCedo" class="status-link-alert">⚠️ Nenhum link ativado!</div>
+        <div class="friend-chat-container">
+            <div class="friend-chat-messages" id="chat-msg-OdeioAcordarCedo"></div>
+            <div class="friend-chat-input-area"><input type="text" id="chat-input-OdeioAcordarCedo" placeholder="Discutir tópicos, enviar links, vírus..."><button onclick="sendTargetMessage('OdeioAcordarCedo')">Postar</button></div>
+        </div>
+    </div>
+  </div>
+            
+            
+            <div class="item-card" onclick="openTargetProfile('modalComunidade14', 'OdeioAcordarCedo')">
+                <div class="item-img"> <img src=  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ186USxaMWaL_5YYPnm6WcNCJBK7eHWpRHpTyia1eMxA&s"<!--"https://raw.githubusercontent.com/EdsonSimplcio/Bananada/refs/heads/main/Colecionador.jpg"--> style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">alt="Img"></div>
+                <div class="item-name">O povo é doido</div>
+            </div>
+            <div class="modal" id="modalComunidade14">
+    <div class="modal-header"><span>Fórum:  O povo é doido </span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">        
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ186USxaMWaL_5YYPnm6WcNCJBK7eHWpRHpTyia1eMxA&s" style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">         
+        <span style="font-size: 20px; font-weight: bold; color: #003399;">  Amizade verdadeira é quando o amigo é verdadeiramente útil</span>
+        <div  style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"><span style="margin-right: 250px;"><b>Idioma:</b> Português (Brasil)</span><span style="margin-right: 30px;"><b>criado em:</b>09/04/2004</span>
+      <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"> <span style="margin-right: 250px;">     <b>Tipo:</b>Arte e entretenimento </span><span style="margin-right: 30px;"><b>local:</b> Brasil</span> </div>
+         <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"><span style="margin-right: 250px;"> <b>Moderadores:</b>Beltrano cid</span><span style="margin-right: 30px;"><b>Proprietário:</b> Cicrano</span> </div>      
+<div style="font-size: 14px; font-weight: bold; color: #333;"> <span style="margin-right: 250px;"><p></p>Já dizia o grande filósifo, ô Pica pau, "O povo é doido". no que parece ser o crescimento das cidades grandes cidades, na correria, esconde a loucura de uma civilazação. Birutas desfarçados de cidadoes, um monicônio chamado "wall street" e 22 doidos atrás de um bola. O povo é doido. <!--Amigo é coisa para se guardar debaixo de 7 chaves". ouviste a poeisa, Amigo é coisa, é um objeto, e muito útil. Tá tudo alagado por causa da chuva e precisa atravesar A calçada alta para a outra calçada? Use o amigo como ponte. Precisa desce uma ribanceira? Use o amigo como skinbunda.--></span></div>
+ <p></!--Amigo> </p></div>
+                
+        <div style="clear:both;"></div>               
+        <div id="link-alert-OdeioAcordarCedo" class="status-link-alert">⚠️ Nenhum link ativado!</div>
+        <div class="friend-chat-container">
+            <div class="friend-chat-messages" id="chat-msg-OdeioAcordarCedo"></div>
+            <div class="friend-chat-input-area"><input type="text" id="chat-input-OdeioAcordarCedo" placeholder="Discutir tópicos, enviar links, vírus..."><button onclick="sendTargetMessage('OdeioAcordarCedo')">Postar</button></div>
+        </div>
+    </div>
+  </div>
+            
+            <div class="item-card" onclick="openTargetProfile('modalComunidade15', 'OdeioAcordarCedo')">
+                <div class="item-img"> <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEVJ81fY13_map4LiFfgUJRVnINzI9SxvfBj1mmuaVAw&s=10" style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">alt="Img"></div>
+                <div class="item-name">Dieta do Peter pan</div>
+            </div>
+            
+            <div class="modal" id="modalComunidade15">
+    <div class="modal-header"><span>Fórum: Dieta do Peter pan </span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">        
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTMuOXfVVUTc1kFba0wvTrESGYqvF7Nc_bzXJHg-EDWQ&s=10" style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">         
+        <span style="font-size: 20px; font-weight: bold; color: #003399;">  Amizade verdadeira é quando o amigo é verdadeiramente útil</span>
+              
+        <div  style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"><span style="margin-right: 250px;"><b>Idioma:</b> Português (Brasil)</span><span style="margin-right: 30px;"><b>criado em:</b>09/11/2004</span>
+      <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"> <span style="margin-right: 250px;">     <b>Tipo:</b>Rango e Gastronomia </span><span style="margin-right: 30px;"><b>local:</b> Terra do nunca</span> </div>
+         <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"><span style="margin-right: 250px;"> <b>Moderadores:</b>Ciclano layla</span><span style="margin-right: 30px;"><b>Proprietário:</b> Beltrano</span> </div>      
+<div style="font-size: 14px; font-weight: bold; color: #333;"> <span style="margin-right: 250px;"><p></p>Você também já cansou de contar calorias, pesar marmitas e comer frango com batata-doce? Seus problemas acabaram! Bem-vindo à única comunidade do Bananada onde o cardápio é 100% psicológico e zero gordura trans. Como funciona a dieta?Você fecha os olhos com muita força. Você usa o poder do pensamento positivo e da imaginação.Pronto! De repente, aquele prato vazio se transforma em um banquete magnífico, com bolos e lasanhas e muitas delícias.</span></div>
+ <p></!--Amigo> </p></div>
+                
+        <div style="clear:both;"></div>               
+        <div id="link-alert-OdeioAcordarCedo" class="status-link-alert">⚠️ Nenhum link ativado!</div>
+        <div class="friend-chat-container">
+            <div class="friend-chat-messages" id="chat-msg-OdeioAcordarCedo"></div>
+            <div class="friend-chat-input-area"><input type="text" id="chat-input-OdeioAcordarCedo" placeholder="Discutir tópicos, enviar links, vírus..."><button onclick="sendTargetMessage('OdeioAcordarCedo')">Postar</button></div>
+        </div>
+    </div>
+  </div>
+             
+            
+            
+            <div class="item-card" onclick="openTargetProfile('modalComunidade16', 'OdeioAcordarCedo')">
+                <div class="item-img"> <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaZWKZj3vK5tUWLwR-SIRC7Q5xE_mFm7O4Mjbwgp3rWQ&s=10" style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">alt="Img"></div>
+                <div class="item-name">Aceita varrer casa?</div>
+            </div>
+              <div class="modal" id="modalComunidade16">
+    <div class="modal-header"><span>Fórum: Aceita varrer a casa? </span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">        
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQRRw2r_LrwFP2fXqhMPNg7dsXKIvFbBLpRXy7bmeTfw&s=10" style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">         
+        <span style="font-size: 20px; font-weight: bold; color: #003399;">  Varrer a casa é só o que tenho para oferecer</span>
+              
+        <div  style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"><span style="margin-right: 250px;"><b>Idioma:</b> Português (Brasil)</span><span style="margin-right: 30px;"><b>criado em:</b>09/04/2004</span>
+      <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"> <span style="margin-right: 250px;">     <b>Tipo:</b>Arte  entretenimento </span><span style="margin-right: 30px;"><b>local:</b> Brasil</span> </div>
+         <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"><span style="margin-right: 250px;"> <b>Moderadores:</b>Beltrano tt</span><span style="margin-right: 30px;"><b>Proprietário:</b> Cicrano</span> </div>      
+<div style="font-size: 14px; font-weight: bold; color: #333;"> <span style="margin-right: 250px;"><p></p>  Este grupo é de ajuda para almas que ficam envergonhadas por só terem a oferecer a sua casa para as visitas varrerem. Não fique envergonhado, pois isso é uma honra para a visita. Os visitantes vão amar limpar a sua casa e, aí, vocês aproveitam para conversar enquanto ocorre a limpeza. Você, todo feliz, vai oferecer um café para eles, sendo que eles mesmos fizeram o próprio café. E, quando terminarem o presente ofertado pelo residente da casa, já deu tempo para colocar os papos em dia durante a limpeza. Então, você proporcionou um momento lindo de amizade e união aos caros visitantes, que não se esquecerão deste dia.</span></div>
+ <p></!--Amigo> </p></div>
+                
+        <div style="clear:both;"></div>               
+        <div id="link-alert-OdeioAcordarCedo" class="status-link-alert">⚠️ Nenhum link ativado!</div>
+        <div class="friend-chat-container">
+            <div class="friend-chat-messages" id="chat-msg-OdeioAcordarCedo"></div>
+            <div class="friend-chat-input-area"><input type="text" id="chat-input-OdeioAcordarCedo" placeholder="Discutir tópicos, enviar links, vírus..."><button onclick="sendTargetMessage('OdeioAcordarCedo')">Postar</button></div>
+        </div>
+    </div>
+  </div>
+            
+            
+            
+            
+            
+            
+            
+            <div class="item-card" onclick="openTargetProfile('modalComunidade17', 'OdeioAcordarCedo')">
+                <div class="item-img"> <img src="https://raw.githubusercontent.com/EdsonSimplcio/Bananada/refs/heads/main/Colecionador.jpg" style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">alt="Img"></div>
+                <div class="item-name">Pobre colecionador</div>
+            </div>
+               
+        <div class="modal" id="modalComunidade17">
+    <div class="modal-header"><span>Fórum:  Pobre que coleciona dinheiro </span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">        
+        <img src="https://raw.githubusercontent.com/EdsonSimplcio/Bananada/refs/heads/main/Colecionador.jpg"style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">         
+        <span style="font-size: 20px; font-weight: bold; color: #003399;">Pobre que coleciona dinheiro</span>
+        
+     <div  style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"><span style="margin-right: 250px;"><b>Idioma:</b> Português (Brasil)</span><span style="margin-right: 30px;"><b>criado em:</b>11/12/2004</span>
+      <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"> <span style="margin-right: 250px;">     <b>Tipo:</b>Paradoxal Pragmático</span><span style="margin-right: 30px;"><b>local:</b>Banco da praça</span> </div>
+         <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"><span style="margin-right: 250px;"> <b>Moderadores:</b>Zé Riquinho </span><span style="margin-right: 30px;"><b>Proprietário:</b> Élisa da silva</span> </div>      
+<div style="font-size: 14px; font-weight: bold; color: #333;"> <span style="margin-right: 250px;"><p></p>Esta página é dedicada a pessoas que veem a riqueza das bufunfas velhas, sem ligar para a fofoca das pessoas pobres de espírito. Aqui, nesta comunidade, você é a peça que faltava para a nossa coleção. A sua coleção pode ser só de dinheiro achado por aí ou que lhe deram; não importa. Fique à vontade entre nós para leoloar e barganhar os níqueis, e você não vai pagar taxas aqui.</span></div>
+ <p></!--Amigo> </p></div>
+                
+        <div style="clear:both;"></div>               
+        <div id="link-alert-OdeioAcordarCedo" class="status-link-alert">⚠️ Nenhum link ativado!</div>
+        <div class="friend-chat-container">
+            <div class="friend-chat-messages" id="chat-msg-OdeioAcordarCedo"></div>
+            <div class="friend-chat-input-area"><input type="text" id="chat-input-OdeioAcordarCedo" placeholder="Discutir tópicos, enviar links, vírus..."><button onclick="sendTargetMessage('OdeioAcordarCedo')">Postar</button></div>
+        </div>
+    </div>
+  </div>
+        
+        
+        
+            <div class="item-card" onclick="openTargetProfile('modalComunidade18', 'OdeioAcordarCedo')">
+                <div class="item-img"> <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFKCQsRwJ9U27eZO_QOtPLLrWEIREQknPCV3TqulZSTA&s=10                      "       style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">alt="Img"></div>
+                <div class="item-name">alcoólatras Sinônimos(AS)</div>
+            </div>
+      
+                <div class="modal" id="modalComunidade18">
+    <div class="modal-header"><span>Fórum: Comunidade: alcoólatras Sinônimos(AS)</span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">        
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFKCQsRwJ9U27eZO_QOtPLLrWEIREQknPCV3TqulZSTA&s=10             "      style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">         
+        <span style="font-size: 20px; font-weight: bold; color: #003399;">Comunidade: alcoólatras Sinônimos(AS)</span>
+        
+     <div  style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"><span style="margin-right: 250px;"><b>Idioma:</b> Português (Brasil)</span><span style="margin-right: 30px;"><b>criado em:</b>15/06/2004</span>
+      <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"> <span style="margin-right: 250px;">     <b>Tipo:</b>Arte e entretenimento </span><span style="margin-right: 30px;"><b>local:</b> Bar do mé (Brasil)</span> </div>
+         <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"><span style="margin-right: 250px;"> <b>Moderadores:</b>Fulano teteu</span><span style="margin-right: 30px;"><b>Proprietário:</b> Beltrano</span> </div>      
+<div style="font-size: 14px; font-weight: bold; color: #333;"> <span style="margin-right: 250px;"><p></p>Se o problema é ser chamado de alcoólatra, o problema é seu. Se o problema é parar de ser chamado de alcoólatra e ser chamado só de: bêbedo, papudinho, cachaceiro, cu de cana, piguça... Aí o problema é nosso! E bota mais uma aí.Entre para a nossa comunidade.»<!--Amigo é coisa para se guardar debaixo de 7 chaves". ouviste a poeisa, Amigo é coisa, é um objeto, e muito útil. Tá tudo alagado por causa da chuva e precisa atravesar A calçada alta para a outra calçada? Use o amigo como ponte. Precisa desce uma ribanceira? Use o amigo como skinbunda.--></span></div>
+ <p></!--Amigo> </p></div>
+                
+        <div style="clear:both;"></div>               
+        <div id="link-alert-OdeioAcordarCedo" class="status-link-alert">⚠️ Nenhum link ativado!</div>
+        <div class="friend-chat-container">
+            <div class="friend-chat-messages" id="chat-msg-OdeioAcordarCedo"></div>
+            <div class="friend-chat-input-area"><input type="text" id="chat-input-OdeioAcordarCedo" placeholder="Discutir tópicos, enviar links, vírus..."><button onclick="sendTargetMessage('OdeioAcordarCedo')">Postar</button></div>
+        </div>
+    </div>
+  </div>
+        
+        
+      
+            <div class="item-card" onclick="openTargetProfile('modalComunidade19', 'LoucosPorCodigo')">
+                <div class="item-img"><img src="https://raw.githubusercontent.com/EdsonSimplcio/Bananada/refs/heads/main/pessoasnovacuo.jpg"                    alt="Img"></div>
+                <div class="item-name">Já fiquei no vácuo</div>
+            </div>
+  
+      <div class="modal" id="modalComunidade19">
+    <div class="modal-header"><span>Fórum:  Já fiquei no vácuo</span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">        
+        <img src= "     https://raw.githubusercontent.com/EdsonSimplcio/Bananada/refs/heads/main/pessoasnovacuo.jpg"                          style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">         
+        <span style="font-size: 20px; font-weight: bold; color: #003399;">  Já fiquei no vácuo, na merda.  </span>
+        
+     <div  style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"><span style="margin-right: 250px;"><b>Idioma:</b> Português. (Brasil).</span><span style="margin-right: 30px;"><b>criado em:</b>01/04/2004</span>
+      <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"> <span style="margin-right: 250px;">     <b>Tipo:</b>Artes e entretenimento </span><span style="margin-right: 30px;"><b>local:</b> Brasil</span> </div>
+         <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"><span style="margin-right: 250px;"> <b>Moderadores:</b>edu du e dudu</span><span style="margin-right: 30px;"><b>Proprietário:</b> Cicrano</span> </div>      
+<div style="font-size: 14px; font-weight: bold; color: #333;"> <span style="margin-right: 250px;"><p></p>Este grupo é para quem já estendeu a mão para cumprimentar alguém e, por algum motivo, a pessoa o deixou de mão estendida, no vácuo, na merda, e não quis papo com o "Zé-ninguém" (talvez ela ache de você isso). Às vezes, a pessoa pode estar muito preocupada com a luta do dia a dia. Então, não pense que foi desprezado. Aqui, nós não vamos deixar você na merda, no vácuo espacial. Nós estendemos as duas mãos para você. Seja bem-vindo!</span></div>
+ <p></!--Amigo> </p></div>
+                
+        <div style="clear:both;"></div>               
+        <div id="link-alert-OdeioAcordarCedo" class="status-link-alert">⚠️ Nenhum link ativado!</div>
+        <div class="friend-chat-container">
+            <div class="friend-chat-messages" id="chat-msg-OdeioAcordarCedo"></div>
+            <div class="friend-chat-input-area"><input type="text" id="chat-input-OdeioAcordarCedo" placeholder="Discutir tópicos, enviar links, vírus..."><button onclick="sendTargetMessage('OdeioAcordarCedo')">Postar</button></div>
+        </div>
+    </div>
+  </div>
+        
+        
+  
+  
+            <div class="item-card" onclick="openTargetProfile('modalComunidade20', 'Escondidinho')">
+                <div class="item-img"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNxZG8JanFLv3WJIxhmEX7icQe6FJtZD8whYdJIDiMtQ&s=10                     "alt="Img"></div>
+                <div class="item-name">água na sopa</div>
+            </div>
+
+    <div class="modal" id="modalComunidade20">
+    <div class="modal-header"><span>Fórum:  Coloca água na sopa pois chegou visita   </span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">        
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNxZG8JanFLv3WJIxhmEX7icQe6FJtZD8whYdJIDiMtQ&s=10               "  style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">         
+        <span style="font-size: 20px; font-weight: bold; color: #003399;">Coloca água na sopa pois chegou visita</span>
+        
+     <div  style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"><span style="margin-right: 250px;"><b>Idioma:</b> Português. (Brasil).</span><span style="margin-right: 30px;"><b>criado em:</b>03/02/2005</span>
+      <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"> <span style="margin-right: 250px;">     <b>Tipo:</b>Gastronomia e Podriçe</span><span style="margin-right: 30px;"><b>local:</b> Brasil.</span> </div>
+         <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"><span style="margin-right: 250px;"> <b>Moderadores:</b>Dedé, Fulano.</span><span style="margin-right: 30px;"><b>Proprietário:</b> Zé ninguém.</span> </div>      
+<div style="font-size: 14px; font-weight: bold; color: #333;"> <span style="margin-right: 250px;"><p></p>Quem é que já não estava em casa, a preparar uma sopinha para comer sozinho e a deliciar-se no lazer com essa refeição light, quando, do nada, chegam visitas? Parece que desceram de paraquedas! Dá vontade de dar uma voadora dupla giratória no peito delas, mas temos de agir educadamente. Se a porção de sopa é só para uma pessoa, o que fazer? Coloca mais água na sopa, ora! Vai haver porção para toda a visita, sopa com sabor aguada.</span></div>
+<p></!--Amigo> </p></div>
+                
+        <div style="clear:both;"></div>               
+        <div id="link-alert-OdeioAcordarCedo" class="status-link-alert">⚠️ Nenhum link ativado!</div>
+        <div class="friend-chat-container">
+            <div class="friend-chat-messages" id="chat-msg-OdeioAcordarCedo"></div>
+            <div class="friend-chat-input-area"><input type="text" id="chat-input-OdeioAcordarCedo" placeholder="Discutir tópicos, enviar links, vírus..."><button onclick="sendTargetMessage('OdeioAcordarCedo')">Postar</button></div>
+        </div>
+    </div>
+  </div>
+        
+        
+
+
+            <div class="item-card" onclick="openTargetProfile('modalComunidade21', 'ForumAntivirus')">
+                <div class="item-img"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeNo89_0rIXibJhtwUcHV-H15DOySH48tsUTwCQ_WXHA&s=10alt="Img"></div>
+                <div class="item-name">Senta que lá vem a fofoca</div>
+            </div>
+
+    <div class="modal" id="modalComunidade21">
+    <div class="modal-header"><span>Fórum: Senta que lá vem a fofoca</span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">        
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeNo89_0rIXibJhtwUcHV-H15DOySH48tsUTwCQ_WXHA&s=10alt="style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">         
+        <span style="font-size: 20px; font-weight: bold; color: #003399;">Senta que lá vem a fofoca</span>
+        
+     <div  style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"><span style="margin-right: 250px;"><b>Idioma:</b> Cuxicho (Brasil).</span><span style="margin-right: 30px;"><b>criado em:</b>01/04/2004</span>
+      <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"> <span style="margin-right: 250px;">     <b>Tipo:</b>Arte  entretenimento </span><span style="margin-right: 30px;"><b>local:</b> Janela da vizinha</span> </div>
+         <div style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #333;"><span style="margin-right: 250px;"> <b>Moderadores:</b>Beltrano cid</span><span style="margin-right: 30px;"><b>Proprietário:</b> Falciane</span> </div>      
+<div style="font-size: 14px; font-weight: bold; color: #333;"> <span style="margin-right: 250px;"><p></p> "Contar histórias é ensinar conversando, contar fofocas é errar falando". essa comunidade é para o ser ,que , gostar de ir para o lado B da conversa, é para pessoas que não aguenta fica na normalidade de um diálogo rotineiro, e sente a necessidade de colocar o ingrediente:"eu aumento mais não invento", no bate papo. Sinta a vontade no nosso grupo para falar da vida alheia.</span></div>
+ <p></!--Amigo> </p></div>
+                
+        <div style="clear:both;"></div>               
+        <div id="link-alert-OdeioAcordarCedo" class="status-link-alert">⚠️ Nenhum link ativado!</div>
+        <div class="friend-chat-container">
+            <div class="friend-chat-messages" id="chat-msg-OdeioAcordarCedo"></div>
+            <div class="friend-chat-input-area"><input type="text" id="chat-input-OdeioAcordarCedo" placeholder="Discutir tópicos, enviar links, vírus..."><button onclick="sendTargetMessage('OdeioAcordarCedo')">Postar</button></div>
+        </div>
+    </div>
+  </div>
+        
+        
+ 
+          
+                
+            </li>
+        </ul>
+    </div>
+</div>
+    
+    
+    
+    
+
+
+
+
+    
+    
+
+<div class="live-chat-dock" id="liveChatDock">
+    <div class="live-chat-dock-header" onclick="toggleChatDock()">
+        <span>💬 Chat Online Multiplayer</span>
+        <span style="cursor:pointer; font-weight: bold; font-size: 14px;" id="chatDockToggleBtn">_</span>
+    </div>
+    <div class="live-chat-body">
+        <iframe src="https://edsonsimplcio.github.io/Meu-jogo-multiplayer-/" style="width:100%; height:100%; border:none; background:transparent;"></iframe>
+    </div>
+</div>
+
+<div class="antivirus-dock" id="antivirusDock">
+    <div class="antivirus-header">
+        <span>🛡️ Central de Proteção Antivírus</span>
+    </div>
+    <div class="antivirus-body">
+        <p style="margin: 2px; font-weight: bold; color: #2e7d32;">Ameaça detectada no Terminal!</p>
+        <p style="font-size: 10px; margin: 2px; color: #555;">Insira um código de vacina válido:</p>
+        <input type="text" id="antivirusCodeInput" placeholder="Ex: avast2000">
+        <br>
+        <button onclick="checkAntivirusCode()">Aplicar Vacina</button>
+    </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeAllModals()"></div>
+
+<div class="virus-modal" id="virusModal">
+    <div class="virus-header"><span>⚠️ CRITICAL INFECTION DETECTED 0x666</span></div>
+    <div class="virus-content">
+        <p style="font-size: 32px; margin: 5px;">☠️</p>
+        <p style="font-weight: bold; color: #d32f2f; font-size: 14px;">SEU SISTEMA OPERACIONAL FOI BLOQUEADO!</p>
+        <p>Um script malicioso foi disparado via chat de recados.</p>
+        <p style="background: #000; color: #0f0; padding: 5px; font-size: 11px; font-weight: bold;">Para desbloquear, digite uma palavra Antivírus válida no módulo inferior esquerdo!</p>
+    </div>
+</div>
+
+<div class="modal" id="modalFriend1">
+    <div class="modal-header"><span>Chat com Maria</span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">
+        
+                           
+        <div class="header">
+    <div class="logo">bananada</div>
+    <div class="top-nav">
+        <a href="#">início</a> | <a href="#">perfil</a> | <a href="#">scrapbook</a>
+        <div class="admin-code-top">
+            <label>CÓDIGO:</label>
+            <input type="text" id="secretCodeInput" placeholder="Ex: link1">
+            <button onclick="checkSecretCode()">Enviar</button>
+        </div>
+    </div>
+</div>
+               
+        <div class="profile-img">                  
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT93Db0NED0MuDpGJKBohUoF7TpGImtL2n4UMA_1L-LRA&s=10           "      alt="Foto de Perfil" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+        </div>                
+        <div id="link-alert-Maria" class="status-link-alert">⚠️ Nenhum link ativado!</div>
+        <div class="friend-chat-container">
+            <div class="friend-chat-messages" id="chat-msg-Maria"></div>
+            <div class="friend-chat-input-area"><input type="text" id="chat-input-Maria" placeholder="Envie links, vírus ou antivírus..."><button onclick="sendTargetMessage('Maria')">Enviar</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="modalFriend2">
+    <div class="modal-header"><span>Chat com toin</span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">
+        
+          <div class="header">
+    <div class="logo">bananada</div>
+    <div class="top-nav">
+        <a href="#">início</a> | <a href="#">perfil</a> | <a href="#">scrapbook</a>
+        <div class="admin-code-top">
+            <label>CÓDIGO:</label>
+            <input type="text" id="secretCodeInput" placeholder="Ex: link1">
+            <button onclick="checkSecretCode()">Enviar</button>
+        </div>
+    </div>
+</div>
+        
+        <div class="profile-img">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTv3M49VQKYuxvlI08dWiwuphecahZ2rYkrQRwdtgBJmg&s=10 "                 alt="Foto de Perfil" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+        </div>
+        <div id="link-alert-toin" class="status-link-alert">⚠️ Nenhum link ativado!</div>
+        <div class="friend-chat-container">
+            <div class="friend-chat-messages" id="chat-msg-toin"></div>
+            <div class="friend-chat-input-area"><input type="text" id="chat-input-toin" placeholder="Envie links, vírus ou antivírus..."><button onclick="sendTargetMessage('toin')">Enviar</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="modalFriend3">
+    <div class="modal-header"><span>Chat com Ana</span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">
+        
+          <div class="header">
+    <div class="logo">bananada</div>
+    <div class="top-nav">
+        <a href="#">início</a> | <a href="#">perfil</a> | <a href="#">scrapbook</a>
+        <div class="admin-code-top">
+            <label>CÓDIGO:</label>
+            <input type="text" id="secretCodeInput" placeholder="Ex: link1">
+            <button onclick="checkSecretCode()">Enviar</button>
+        </div>
+    </div>
+</div>
+        
+        <div class="profile-img">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfTlVRUk87GIN6VWJ80gEquJoZsRBgW9ebiL6lR8JhRA&s=10 "                                  alt="Foto de Perfil" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+        </div>
+        <div id="link-alert-Ana" class="status-link-alert">⚠️ Nenhum link ativado!</div>
+        <div class="friend-chat-container">
+            <div class="friend-chat-messages" id="chat-msg-Ana"></div>
+            <div class="friend-chat-input-area"><input type="text" id="chat-input-Ana" placeholder="Envie links, vírus ou antivírus..."><button onclick="sendTargetMessage('Ana')">Enviar</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="modalFriend4">
+    <div class="modal-header"><span>Chat com Lucas</span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">
+        
+          <div class="header">
+    <div class="logo">bananada</div>
+    <div class="top-nav">
+        <a href="#">início</a> | <a href="#">perfil</a> | <a href="#">scrapbook</a>
+        <div class="admin-code-top">
+            <label>CÓDIGO:</label>
+            <input type="text" id="secretCodeInput" placeholder="Ex: link1">
+            <button onclick="checkSecretCode()">Enviar</button>
+        </div>
+    </div>
+</div>
+        
+        <div class="profile-img">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqzONfnxjqJWdABNTXAxAldHS3pgbZYDYVMZsucwO-5A&s=10  "                alt="Foto de Perfil" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+        </div>
+        <div id="link-alert-Lucas" class="status-link-alert">⚠️ Nenhum link ativado!</div>
+        <div class="friend-chat-container">
+            <div class="friend-chat-messages" id="chat-msg-Lucas"></div>
+            <div class="friend-chat-input-area"><input type="text" id="chat-input-Lucas" placeholder="Envie links, vírus ou antivírus..."><button onclick="sendTargetMessage('Lucas')">Enviar</button></div>
+        </div>
+    </div>
+</div>
+                              
+<div class="modal" id="modalComunidade1">
+    <div class="modal-header"><span>Fórum: Pessoas pobres que coleciona dinheiro</span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">        
+        <img src="https://raw.githubusercontent.com/EdsonSimplcio/Bananada/refs/heads/main/Colecionador.jpg" style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">         
+        <span style="font-size: 20px; font-weight: bold; color: #003399;">Pessoas pobres que coleciona dinheiro</span>
+        <div style="font-size: 14px; font-weight: bold; color: #333;"><p>esta página e dedicada para pessoas que vê a riqueza das bufufas véia, sem ligar para a fofoca das pessoas pobri de esprito</p></div>
+        <div style="clear:both;"></div>
+        <div id="link-alert-OdeioAcordarCedo" class="status-link-alert">⚠️ Nenhum link ativado!</div>
+        <div class="friend-chat-container">
+            <div class="friend-chat-messages" id="chat-msg-OdeioAcordarCedo"></div>
+            <div class="friend-chat-input-area"><input type="text" id="chat-input-OdeioAcordarCedo" placeholder="Discutir tópicos, enviar links, vírus..."><button onclick="sendTargetMessage('OdeioAcordarCedo')">Postar</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="modalComunidade2">
+    <div class="modal-header"><span>Já fiquei no vácuo</span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">        
+        <img src="https://raw.githubusercontent.com/EdsonSimplcio/Bananada/refs/heads/main/pessoasnovacuo.jpg" style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">        
+        <span style="font-size: 20px; font-weight: bold; color: #003399;">Nao sou o Tardígrado mas já aguentei um vácuo</span>
+        <div style="font-size: 14px; font-weight: bold; color: #333;"><p>esta página é para quem estendeu a mão para cumprimentar alguém e por algum motivo a pessoa deixou você de mão estendida na merda, no vácuo.</p></div>
+        <div style="clear:both;"></div>
+        <div id="link-alert-LoucosPorCodigo" class="status-link-alert">⚠️ Nenhum link ativado!</div>
+        <div class="friend-chat-container">
+            <div class="friend-chat-messages" id="chat-msg-LoucosPorCodigo"></div>
+            <div class="friend-chat-input-area"><input type="text" id="chat-input-LoucosPorCodigo" placeholder="Discutir tópicos, enviar links, vírus..."><button onclick="sendTargetMessage('LoucosPorCodigo')">Postar</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="modalComunidade3">
+    <div class="modal-header"><span>Já vai tarde</span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">
+        <img src="https://i.imgur.com/46uoC6L.jpeg" style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">
+        <span style="font-size: 20px; font-weight: bold; color: #003399;">Já vai tarde</span>
+        <div style="font-size: 14px; font-weight: bold; color: #333;"><p>esta página e dedicada para pessoas que vê a riqueza das bufufas véia, sem ligar para a fofoca das pessoas pobri de esprito</p></div>
+        <div style="clear:both;"></div>
+        <div id="link-alert-Escondidinho" class="status-link-alert">⚠️ Nenhum link ativado!</div>
+        <div class="friend-chat-container">
+            <div class="friend-chat-messages" id="chat-msg-Escondidinho"></div>
+            <div class="friend-chat-input-area"><input type="text" id="chat-input-Escondidinho" placeholder="Discutir tópicos, enviar links, vírus..."><button onclick="sendTargetMessage('Escondidinho')">Postar</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="modalComunidade4">
+    <div class="modal-header"><span>Já usei os 3 segundos</span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content">
+        <img src="https://i.imgur.com/46uoC6L.jpeg" style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">
+        <span style="font-size: 20px; font-weight: bold; color: #003399;">Já usei os 3 segundos</span>
+        <div style="font-size: 14px; font-weight: bold; color: #333;"><p>esta página e dedicada para pessoas que vê a riqueza das bufufas véia, sem ligar para a fofoca das pessoas pobri de esprito</p></div>
+        <div style="clear:both;"></div>
+        <div id="link-alert-ForumAntivirus" class="status-link-alert">⚠️ Nenhum link ativado!</div>
+        <div class="friend-chat-container">
+            <div class="friend-chat-messages" id="chat-msg-ForumAntivirus"></div>
+            <div class="friend-chat-input-area"><input type="text" id="chat-input-ForumAntivirus" placeholder="Discutir tópicos, enviar links, vírus..."><button onclick="sendTargetMessage('ForumAntivirus')">Postar</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="modalFriend8">
+    <div class="modal-header"><span>Minijogo: Vacuuo (Colheita) 🐍</span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content" style="text-align: center; background-color: #e1f5fe;">
+        <div style="margin-bottom: 10px;">Moedas: <span id="money">0</span>/200 💰</div>
+        <div id="farm-grid" style="display: grid; grid-template-columns: repeat(3, 80px); gap: 10px; justify-content: center; background: #8d6e63; padding: 15px; position: relative; width: 260px; margin: 0 auto;">
+            <div class="plot" onclick="interactPlot(0)" id="plot-0" style="width: 80px; height: 80px; background: #6d4c41; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer;">🟫</div>
+            <div class="plot" onclick="interactPlot(1)" id="plot-1" style="width: 80px; height: 80px; background: #6d4c41; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer;">🟫</div>
+            <div class="plot" onclick="interactPlot(2)" id="plot-2" style="width: 80px; height: 80px; background: #6d4c41; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer;">🟫</div>
+            <div class="plot" onclick="interactPlot(3)" id="plot-3" style="width: 80px; height: 80px; background: #6d4c41; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer;">🟫</div>
+            <div class="plot" onclick="interactPlot(4)" id="plot-4" style="width: 80px; height: 80px; background: #6d4c41; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer;">🟫</div>
+            <div class="plot" onclick="interactPlot(5)" id="plot-5" style="width: 80px; height: 80px; background: #6d4c41; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer;">🟫</div>
+        </div>
+        <button onclick="resetGame()" style="margin-top: 10px;">Reiniciar</button>
+    </div>
+</div>
+
+<div class="modal" id="modalAquario">
+    <div class="modal-header"><span>Aquário Faminto 🐠</span><span class="close-btn" onclick="closeAllModals()">X</span></div>
+    <div class="modal-content" style="text-align: center;">
+        <div id="aquarium-tank" onclick="dropFood(event)"></div>
+        <div style="margin-top: 10px; font-weight: bold;">Peixes Alimentados: <span id="fed-count">0</span>/4</div>
+        <button onclick="initAquarium()" style="margin-top: 5px;">Reiniciar Aquário</button>
+    </div>
+</div>
+
+<div class="modal" id="modalFriend7"><div class="modal-header"><span>Perfil</span><span class="close-btn" onclick="closeAllModals()">X</span></div><div class="modal-content">Dados de Perfil dos Anos 2000.<div class="col-center">
+            <p><strong>nome do usuário:</strong> <span id="active-link-status" style="color: #d32f2f; font-weight: bold;">Zé Fulano </span></p>  
+            <p><strong>Cidade natal...:</strong> <span id="active-link-status" style="color: #d32f2f; font-weight: bold;">towville</span></p>
+            <p><strong>Cursos atuais..:</strong> <span id="status-vacuuo" style="font-weight:bold; color:red;">remendador de barcia </span></p>
+            <p><strong>relacionamento.:</strong> <span id="status-aquario" style="font-weight:bold; color:red;">livre, leve e chorando </span></p>
+            <p><strong>Hobby preferido:</strong> <span id="status-config-tasks" style="font-weight:bold; color:red;">deslizar no esquibunda </span></p>
+            <hr>
+            <p><strong>Segurança do Windows:</strong> <span id="status-seguranca" style="color: green; font-weight: bold;">Protegido🛡️</span></p>
+        </div></div></div>
+    
+<div class="modal" id="modalFotos"><div class="modal-header"><span>Fotos</span><span class="close-btn" onclick="closeAllModals()">X</span></div><div class="modal-content">Álbum Digital de Fotos Recortadas. <div class="profile-img">
+            <img src="https://lh3.googleusercontent.com/d/1SfkJlRzPTv2JEVgtWBOCCt2CPrGPLx6h=s1000        "        alt="Foto de Perfil" style="width: 500%; height: 300%; border-radius: 0%; object-fit: cover;">
+        </div></div></div>
+<div class="modal" id="modalVideos"><div class="modal-header"><span>Vídeos</span><span class="close-btn" onclick="closeAllModals()">X</span></div><div class="modal-content">Meus Vídeos Favoritos Incorporados.   <!--<img src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcSqoeCXVELGNa8nXRKPWgtjfZqPLsC0cyJpS_fpyPVF3-9sPGLf" style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">-->         
+    
+    
+    
+    <div class="container-coluna">
+        
+            <div class="modal-content">Meus Vídeos Favoritos Incorporados.  </div> <!--<img src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcSqoeCXVELGNa8nXRKPWgtjfZqPLsC0cyJpS_fpyPVF3-9sPGLf" style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">-->         
+    <span style="font-size: 20px; font-weight: bold; color: #003399;">  Sereias reais capturadas pela as câmeras</span>
+                
+<a href=" https://m.youtube.com/watch?v=v37mrJOntEQ&t=4s&pp=ygUgc2VyZWlhcyByZWFpcyBncmF2YWRpcyBlbSB2aWRlb3M%3D  " target="_blank" class="link-imagem">
+            <img src="  https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6jpFLxgUQtUynI1FAMsNKsr_sorHl8Av_JOGLlv5IGw&s=10   " alt="Link para o Google">
+        </a>
+            
+            <div class="modal-content">Meus Vídeos Favoritos Incorporados.  </div> <!--<img src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcSqoeCXVELGNa8nXRKPWgtjfZqPLsC0cyJpS_fpyPVF3-9sPGLf" style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">-->         
+      <span style="font-size: 20px; font-weight: bold; color: #003399;">  Os 10 rasantes mais incríveis</span>
+                
+<a href="https://youtu.be/NaIW9u7DGWA?is=stFEhkDgV-dO5CxO" target="_blank" class="link-imagem">
+            <img src="https://i.ytimg.com/vi/aQ5BXkItVE0/sddefault.jpg?sqp=-oaymwEmCIAFEOAD8quKqQMa8AEB-AH-BIAC4AOKAgwIABABGE0gVyhlMA8=&rs=AOn4CLCG154hqN40E8ec6i91jJw3nLzWJA" alt="Link para o Google">
+        </a>
+        
+        
+          <div class="modal-content">Meus Vídeos Favoritos Incorporados.  </div> <!--<img src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcSqoeCXVELGNa8nXRKPWgtjfZqPLsC0cyJpS_fpyPVF3-9sPGLf" style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">-->         
+      <span style="font-size: 20px; font-weight: bold; color: #003399;">   Rock lee vs Gaara: in the end </span>
+                
+<a href="https://youtu.be/JZizJPFoL3U?is=l_77SYKoeJuUDXa6" target="_blank" class="link-imagem">
+            <img src="https://i.ytimg.com/vi/JZizJPFoL3U/hqdefault.jpg?sqp=-oaymwE2COADEI4CSFXyq4qpAygIARUAAIhCGAFwAcABBvABAfgB_gSAAuADigIMCAAQARhlIGUoZTAP&rs=AOn4CLBBJHHGs31c-1fPAjn0CDp1G7t7-Q" alt="Link para o Google">
+        </a>
+        
+        
+          <div class="modal-content">Meus Vídeos Favoritos Incorporados.  </div> <!--<img src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcSqoeCXVELGNa8nXRKPWgtjfZqPLsC0cyJpS_fpyPVF3-9sPGLf" style="width:150px;height:150px;background:#ccc;float:left;margin-right:10px;" alt="Comunidade">-->         
+      <span style="font-size: 20px; font-weight: bold; color: #003399;">  HEAYYAAEYAAAEYAA</span>
+                
+<a href="https://youtu.be/ZZ5LpwO-An4?is=WWkKD4mKmxmUhJy8" target="_blank" class="link-imagem">
+            <img src="https://i.ytimg.com/vi/ZZ5LpwO-An4/hqdefault.jpg?sqp=-oaymwEmCOADEOgC8quKqQMa8AEB-AHeA4AC6AKKAgwIABABGH8gXigbMA8=&rs=AOn4CLBxOdApsQdTvg-YYAaJAi4w7k5GOg" alt="Link para o Google">
+    
+        </a>
+    </div>
+    
+    
+    
+    
+    
+    </div>    
+</div></div>
+
+
+<div class="modal" id="modalHobby"><div class="modal-header"><span>Hobby</span><span class="close-btn" onclick="closeAllModals()">X</span></div><div class="modal-content">Hobbies, Livros e Estilo de vida.</div></div>
+
+
+<script>
+
+
+const linkFrasesManager = {
+    "link1": [
+        "O Marcelo tava perguntando pelo Cicrano no grupo.",
+        "A Tatá quer saber se o Fulano vai?",
+        "E o Beltrano tá vivo?",
+        "Alguém falou mal do Zé ninguém no chat da Tatá."
+    ],
+    "link2": [
+        "O Cicrano mandou um scrap estranho ontem.",
+        "Viram o Fulano trancado no quarto jogando bat gut.",
+        "Disseram que o Beltrano sumiu da colheita do vácuo.",
+        "O Zé ninguém foi o único que não mandou depoimento."
+    ],
+    "link3": [
+        "Acho que o Cicrano hackeou a senha de alguém.",
+        "O Fulano foi visto adicionando todo mundo da comunidade.",
+        "A Tatá postou uma foto antiga com o Beltrano.",
+        "Quem é esse Zé ninguém que tá mandando vírus?"
+    ],
+    "link4": [
+        "O Cicrano não sai mais do chat online multiplayer.",
+        "Será que o Fulano vai me deixar no vácuo de novo?",
+        "O Beltrano me disse que o sistema ia mudar de cor.",
+        "Deixaram um recado anônimo pro Zé ninguém."
+    ],
+    "link5": [
+        "Falaram pro Cicrano que a comunidade é secreta.",
+        "O Fulano tá querendo vender moedas do jogo da cobra.",
+        "O Beltrano foi bloqueado por mandar spam.",
+        "Até o Zé ninguém já conseguiu passar da fase do aquário."
+    ],
+    "link6": [
+        "O Marcelo brigou com o Cicrano por causa de um link.",
+        "O Fulano tá espalhando que o Windows tá desprotegido.",
+        "A Tatá mandou o Beltrano limpar os recados.",
+        "O Zé ninguém tá na lista de amigos de todo mundo."
+    ],
+    "link7": [
+        "A comunidade do Cicrano foi banida do site.",
+        "O Fulano postou no fórum que odeia acordar cedo.",
+        "O Beltrano ganhou o troféu do jogo de plataforma 2D.",
+        "Ninguém quis fazer dupla com o Zé ninguém na tarefa."
+    ],
+    "link8": [
+        "O Cicrano foi visto no perfil da Maria ontem à noite.",
+        "Será que o Fulano tem o código da vacina do antivírus?",
+        "O Beltrano tá acumulando pontos no painel config.",
+        "O Zé ninguém enviou uma mensagem codificada no chat."
+    ],
+    "link9": [
+        "A Tatá ignorou o Cicrano completamente no fórum.",
+        "O Fulano foi o único que curtiu o scrapbook hoje.",
+        "O Beltrano tá jogando estilingue desde as cinco da manhã.",
+        "O Zé ninguém mudou o status do perfil pra ocupado."
+    ],
+    "link10": [
+        "O Cicrano disse que o Toin pegou as moedas dele.",
+        "O Fulano perguntou se o captcha de animal é difícil.",
+        "O Beltrano tá com a foto de perfil desatualizada.",
+        "Acharam o Zé ninguém perdido na aba de vídeos."
+    ],
+    "link11": [
+        "O Marcelo e o Cicrano estão online no chat agora.",
+        "O Fulano tá tentando ligar o velocímetro do jogo.",
+        "O Beltrano não aceitou o convite da comunidade de código.",
+        "O Zé ninguém tá atualizando o hobby dele no perfil."
+    ],
+    "link12": [
+        "O Cicrano mandou uma figurinha bizarra no chat da Tatá.",
+        "Alguém avisa pro Fulano que o link dele deu erro.",
+        "O Beltrano tá rindo dos comentários do fórum antivírus.",
+        "O Zé ninguém comprou comida pro peixe do aquário."
+    ],
+    "link13": [
+        "O Cicrano jura que o sistema dele ficou todo amarelo.",
+        "O Fulano tá fofocando sobre a lista de amigos da Ana.",
+        "O Beltrano foi o primeiro a completar as cinco tarefas.",
+        "O Zé ninguém tá com medo do alerta critical infection."
+    ],
+    "link14": [
+        "Achei o Cicrano comentando na foto do Lucas.",
+        "O Fulano tá procurando o link correto no topo da página.",
+        "O Beltrano disse que o script tá dando tremor na tela.",
+        "Todo mundo ignorou o depoimento do Zé ninguém."
+    ],
+    "link15": [
+        "O Cicrano esqueceu de alimentar os peixes.",
+        "O Fulano tá trancado no modal do jogo de plataforma."
+    ],
+    "link16": [
+        "O Cicrano mudou o nome do perfil pra hacker fake.",
+        "O Fulano tá jogando o jogo do desvia e defende.",
+        "O Beltrano não quer responder o chat online de jeito nenhum.",
+        "O Zé ninguém tá na área de segurança do Windows."
+    ],
+    "link17": [
+        "O Beltrano tá reclamando do fundo verde lodo.",
+        "O Zé ninguém sumiu depois do alerta do assistente de sistema.",
+        "O Beltrano tá reclamando do fundo verde lodo.",
+     "O Beltrano tá reclamando do fundo verde lodo."
+       ]
+};
+  
+  
+  
+  
+    // --- DATABASES DO SISTEMA ---
+  /*  const linkFrasesManager = {
+        "link1":  ["frase um do link um", "frase dois do link um", "frase tres do link um", "frase quatro do link um"],
+        "link2":  ["frase um do link dois", "frase dois do link dois", "frase tres do link dois", "frase quatro do link dois"],
+        "link3":  ["frase um do link tres", "frase dois do link tres", "frase tres do link tres", "frase quatro do link tres"],
+        "link4":  ["frase um do link quatro", "frase dois do link quatro", "frase tres do link quatro", "frase quatro do link quatro"],
+        "link5":  ["frase um do link cinco", "frase dois do link cinco", "frase tres do link cinco", "frase quatro do link cinco"],
+        "link6":  ["frase um do link seis", "frase dois do link seis", "frase tres do link seis", "frase quatro do link seis"],
+        "link7":  ["frase um do link sete", "frase dois do link sete", "frase tres do link sete", "frase quatro do link sete"],
+        "link8":  ["frase um do link oito", "frase dois do link oito", "frase tres do link oito", "frase quatro do link oito"],
+        "link9":  ["frase um do link nove", "frase dois do link nove", "frase tres do link nove", "frase quatro do link nove"],
+        "link10": ["frase um do link dez", "frase dois do link dez", "frase tres do link dez", "frase quatro do link dez"],
+        "link11": ["frase um do link onze", "frase dois do link onze", "frase tres do link onze", "frase quatro do link onze"],
+        "link12": ["frase um do link doze", "frase dois do link doze", "frase tres do link doze", "frase quatro do link doze"],
+        "link13": ["frase um do link treze", "frase dois do link treze", "frase tres do link treze", "frase quatro do link treze"],
+        "link14": ["frase um do link quatorze", "frase dois do link quatorze", "frase tres do link quatorze", "frase quatro do link quatorze"],
+        "link15": ["frase um do link quinze", "frase dois do link quinze"] ,
+        
+          "link16": ["frase um do link dezesseis", "frase dois do link quatorze", "frase tres do link quatorze", "frase quatro do link quatorze"],
+        "link17": ["frase um do link dezesete", "frase dois do link quinze"] 
+
+        
+        
+    };*/
+
+    const virusFrasesList = [
+        "virus01", "virus02", "virus03", "virus04", "virus05", "virus06", "virus07", "virus08", "virus09", "virus10",
+        "virus11", "virus12", "virus13", "virus14", "virus15", "virus16", "virus17", "virus18", "virus19", "virus20",
+        "virus21", "virus22", "virus23", "virus24", "virus25", "virus26", "virus27", "virus28", "virus29", "virus30",
+        "virus31", "virus32", "virus33", "virus34", "virus35", "virus36", "virus37", "virus38", "virus39", "virus40",
+        "virus41", "virus42", "virus43", "virus44", "virus45", "virus46", "virus47", "virus48", "virus49", "virus50",
+        "virus51", "virus52", "virus53", "virus54", "virus55", "virus56", "virus57", "virus58"
+    ];
+
+    const antivirusFrasesList = [
+        "avast2000", "remover", "limpar", "scan", "antivirus", "deletar", "formatar", "defesa", "protecao", "avira"
+    ];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    const temposDosGrupos = {
+        1: 15000, 2: 30000, 3: 45000, 4: 60000, 5: 75000, 6: 90000, 7: 105000, 8: 120000, 9: 135000, 10: 150000
+    };
+
+    // --- ESTADOS GLOBAIS ---
+    let vacuuoVencido = false;
+    let aquarioVencido = false;
+    let linkAtivo = null;
+    let frasesValidadasDoLink = new Set();
+    let virusAtivo = false;
+    let timeoutsAgendados = [];
+    let perfilAberto = null; // Guardará as janelas sobrepostas flutuantes dos novos games
+
+    // Variáveis Globais de Controle das Novas Tasks do Painel Config
+    let venceuSlingshotGame = false;
+    let venceuVelocimetroGame = false;
+    let venceuVirusGame = false;
+    let venceuJogo2D = false;
+    let venceuCaptchaGame = false;
+
+    // --- SISTEMA DE VERIFICAÇÃO GLOBAIS DE VITÓRIA ---
+    function checarFimDoJogoGeral() {
+        // Conta quantas tasks extras foram finalizadas
+        let concluidasConfig = 0;
+        if(venceuSlingshotGame) { concluidasConfig++; document.getElementById("task-slingshot").innerText = "Concluído ✅"; document.getElementById("task-slingshot").style.color = "green"; }
+        if(venceuVelocimetroGame) { concluidasConfig++; document.getElementById("task-velocimetro").innerText = "Concluído ✅"; document.getElementById("task-velocimetro").style.color = "green"; }
+        if(venceuVirusGame) { concluidasConfig++; document.getElementById("task-virus").innerText = "Concluído ✅"; document.getElementById("task-virus").style.color = "green"; }
+        if(venceuJogo2D) { concluidasConfig++; document.getElementById("task-jogo2d").innerText = "Concluído ✅"; document.getElementById("task-jogo2d").style.color = "green"; }
+        if(venceuCaptchaGame) { concluidasConfig++; document.getElementById("task-captcha").innerText = "Concluído ✅"; document.getElementById("task-captcha").style.color = "green"; }
+
+        // Atualiza display no feed central
+        const statusConfigTxt = document.getElementById("status-config-tasks");
+        statusConfigTxt.innerText = `Concluído (${concluidasConfig}/5) ${concluidasConfig===5?'✅':'❌'}`;
+        if(concluidasConfig === 5) statusConfigTxt.style.color = "green";
+
+        // Se o jogador cumpriu Vacuuo + Aquario + 5 Tasks do Config -> MENSAGEM FINAL SUPREMA
+        if (vacuuoVencido && aquarioVencido && concluidasConfig === 5) {
+            setTimeout(() => {
+                alert("👑 PARABÉNS! Você finalizou todas as tarefas da rede social com sucesso! O sistema está 100% limpo, configurado e funcional. Você completou o jogo!");
+            }, 800);
+        }
+    }
+
+    // --- INTERFACE E CHAT DOCK ---
+    function toggleChatDock() {
+        const dock = document.getElementById("liveChatDock");
+        const btn = document.getElementById("chatDockToggleBtn");
+        if (dock.classList.contains("minimized")) {
+            dock.classList.remove("minimized");
+            btn.innerText = "_";
+        } else {
+            dock.classList.add("minimized");
+            btn.innerText = "🗖";
+        }
+    }
+
+    function toggleDropdown() {
+        const dd = document.getElementById("gamesDropdown");
+        dd.style.display = (dd.style.display === "block") ? "none" : "block";
+    }
+
+    window.addEventListener("click", function(e) {
+        if (!e.target.matches('.more-games-btn')) {
+            const dd = document.getElementById("gamesDropdown");
+            if(dd) dd.style.display = "none";
+        }
+    });
+
+    function openModal(id) {
+        if (virusAtivo) return;
+        document.getElementById(id).style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
+        checarFimDoJogoGeral();
+    }
+
+    function closeAllModals() {
+        if (virusAtivo) return; 
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        document.getElementById('overlay').style.display = 'none';
+        if (typeof aquariumInterval !== 'undefined') clearInterval(aquariumInterval);
+        if (perfilAberto) { perfilAberto.remove(); perfilAberto = null; }
+        checarFimDoJogoGeral();
+    }
+
+    function openTargetProfile(modalId, targetKeyName) {
+        openModal(modalId);
+        const alertEl = document.getElementById(`link-alert-${targetKeyName}`);
+        if (alertEl) {
+            if (linkAtivo) {
+                alertEl.innerText = `✅ LINK ATIVO: ${linkAtivo.toUpperCase()}`;
+                alertEl.style.color = "green";
+            } else {
+                alertEl.innerText = `⚠️ Nenhum link ativo. Configure os 'links' na barra superior.`;
+                alertEl.style.color = "#e65100";
+            }
+        }
+    }
+
+
+
+function checkSecretCode() {
+    // 1. Pega o valor digitado
+    const inputEl = document.getElementById('secretCodeInput');
+    if (!inputEl) {
+        console.error("Erro: O campo 'secretCodeInput' não foi encontrado no HTML.");
+        return;
+    }
+    
+    const inputVal = inputEl.value.trim().toLowerCase();
+    
+    // 2. Valida se o link existe no gerenciador
+    if (linkFrasesManager[inputVal]) {
+        linkAtivo = inputVal;
+        frasesValidadasDoLink.clear();
+        
+        // Atualiza o status visual do link ativo
+        const statusEl = document.getElementById('active-link-status');
+        if (statusEl) {
+            statusEl.innerText = inputVal.toUpperCase();
+            statusEl.style.color = "green";
+        }
+        
+        // 3. Lógica para descobrir o próximo link (Ex: link1 -> link2)
+        let numeroAtual = parseInt(inputVal.replace("link", ""));
+        let proximoNumero = numeroAtual + 1;
+        if (numeroAtual === 15) {
+            proximoNumero = 1; 
+        }
+        let proximoLinkKey = "link" + proximoNumero;
+
+        // 4. Renderiza as frases na tela
+        const containerBox = document.getElementById('display-phrases-container');
+        const listEl = document.getElementById('display-phrases-list');
+
+        if (containerBox && listEl) {
+            listEl.innerHTML = ""; // Limpa a lista antiga
+
+            const frasesExibidas = linkFrasesManager[proximoLinkKey];
+            frasesExibidas.forEach(frase => {
+                let li = document.createElement('li');
+                li.innerText = frase;
+                listEl.appendChild(li);
+            });
+
+            containerBox.style.display = "block"; // Mostra a caixinha
+        } else {
+            console.warn("Aviso: 'display-phrases-container' ou 'display-phrases-list' não existem no HTML.");
+        }
+
+        alert(`Link ${inputVal.toUpperCase()} Carregado! Frases do ${proximoLinkKey.toUpperCase()} exibidas.`);
+        
+    } else {
+        alert("Link Inválido! Use de 'link1' a 'link15'.");
+    }
+    
+    // Limpa o campo de texto
+    inputEl.value = "";
+}
+
+
+
+
+
+
+   /* function checkSecretCode() {
+        const inputVal = document.getElementById('secretCodeInput').value.trim().toLowerCase();
+        if (linkFrasesManager[inputVal]) {
+            linkAtivo = inputVal;
+            frasesValidadasDoLink.clear();
+            document.getElementById('active-link-status').innerText = inputVal.toUpperCase();
+            document.getElementById('active-link-status').style.color = "green";
+            alert(`Link ${inputVal.toUpperCase()} Carregado com Sucesso!`);
+        } else {
+            alert("Link Inválido! Use de 'link1' a 'link15'.");
+        }
+        document.getElementById('secretCodeInput').value = "";
+    }*/
+
+
+
+
+
+
+
+
+//ativar hacher 
+function checkSecretCode() {
+    const inputEl = document.getElementById('secretCodeInput');
+    if (!inputEl) return;
+    
+    const inputVal = inputEl.value.trim().toLowerCase();
+    
+    if (linkFrasesManager[inputVal]) {
+        linkAtivo = inputVal;
+        frasesValidadasDoLink.clear();
+        
+        const statusEl = document.getElementById('active-link-status');
+        if (statusEl) {
+            statusEl.innerText = inputVal.toUpperCase();
+            statusEl.style.color = "green";
+        }
+        
+        // ==================================================
+        // GERENCIADOR DE TEMAS DE PERFIL (LINK1 E LINK3)
+        // ==================================================
+        const profileNameEl = document.querySelector('.profile-name');
+        const containerEl = document.querySelector('.container');
+        
+        if (inputVal === "link1") {
+            // --- TEMA HACKER (LINK 1) ---
+            if (profileNameEl) {
+                profileNameEl.innerHTML = `João Silva <span id="hacker-tag" style="font-family: 'Courier New', monospace; color: #00ff00; font-weight: bold; margin-left: 10px; text-shadow: 0 0 5px #00ff00;">[HACKER]</span>`;
+            }
+            if (containerEl) {
+                containerEl.style.backgroundColor = "#0b1d12"; // Verde lodo escuro
+                containerEl.style.color = "#a3c6a3";
+            }
+        } 
+        else if (inputVal === "link3") {
+            // --- TEMA ASSISTENTE DE SISTEMA (LINK 3) ---
+            if (profileNameEl) {
+                profileNameEl.innerHTML = `João Silva <span id="sistema-tag" style="font-family: 'Tahoma', sans-serif; color: #b58100; font-weight: bold; margin-left: 10px; font-size: 11px;">[A.SISTEMA.]</span>`;
+            }
+            if (containerEl) {
+                containerEl.style.backgroundColor = "#fffde7"; // Amarelo suave/creme
+                containerEl.style.color = "#333333"; // Mantém o texto escuro legível
+            }
+        } 
+        else {
+            // --- RETORNA AO PADRÃO DO SITE (OUTROS LINKS) ---
+            if (profileNameEl) profileNameEl.innerHTML = "João Silva";
+            if (containerEl) {
+                containerEl.style.backgroundColor = "#fff";
+                containerEl.style.color = "";
+            }
+        }
+        // ==================================================
+
+        // Descobre o próximo link (link1 mostra link2, link3 mostra link4...)
+        let numeroAtual = parseInt(inputVal.replace("link", ""));
+        let proximoNumero = numeroAtual + 1;
+        if (numeroAtual === 15) { proximoNumero = 1; }
+        let proximoLinkKey = "link" + proximoNumero;
+
+        // Pega os elementos da caixa de frases central
+        const containerBox = document.getElementById('display-phrases-container');
+        const listEl = document.getElementById('display-phrases-list');
+
+        if (containerBox && listEl) {
+            listEl.innerHTML = ""; // Limpa frases anteriores
+
+            // Busca as frases do próximo link no gerenciador
+            const frasesExibidas = linkFrasesManager[proximoLinkKey];
+            frasesExibidas.forEach(frase => {
+                let li = document.createElement('li');
+                li.innerText = frase;
+                
+                // Estiliza as frases de acordo com o link digitado
+                if (inputVal === "link1") {
+                    li.style.fontFamily = "'Courier New', monospace";
+                    li.style.color = "#00ff00";
+                } else if (inputVal === "link3") {
+                    li.style.fontFamily = "'Tahoma', sans-serif";
+                    li.style.color = "#5d4037"; // Marrom escuro para combinar com amarelo
+                } else {
+                    li.style.fontFamily = "";
+                    li.style.color = "#333";
+                }
+                
+                listEl.appendChild(li);
+            });
+
+            // Torna a caixinha visível no centro do perfil
+            containerBox.style.display = "block"; 
+            
+            // Estiliza a própria caixinha de frases dependendo do tema ativo
+            if (inputVal === "link1") {
+                containerBox.style.background = "#050f09";
+                containerBox.style.border = "1px solid #00ff00";
+            } else if (inputVal === "link3") {
+                containerBox.style.background = "#fff9c4"; // Amarelo um pouco mais forte para destacar a caixinha
+                containerBox.style.border = "1px solid #fbc02d";
+            } else {
+                containerBox.style.background = "#FFF8E1";
+                containerBox.style.border = "1px dashed #FFCC00";
+            }
+        }
+        
+    } else {
+        alert("Link Inválido! Use de 'link1' a 'link15'.");
+    }
+    
+    inputEl.value = ""; // Limpa o campo de texto
+}
+
+
+
+
+
+
+
+// ativar hacker
+/*function checkSecretCode() {
+    const inputEl = document.getElementById('secretCodeInput');
+    if (!inputEl) return;
+    
+    const inputVal = inputEl.value.trim().toLowerCase();
+    
+    if (linkFrasesManager[inputVal]) {
+        linkAtivo = inputVal;
+        frasesValidadasDoLink.clear();
+        
+        const statusEl = document.getElementById('active-link-status');
+        if (statusEl) {
+            statusEl.innerText = inputVal.toUpperCase();
+            statusEl.style.color = "green";
+        }
+        
+        // ==========================================
+        // LÓGICA DO TEMA HACKER (EXCLUSIVA DO LINK1)
+        // ==========================================
+        const profileNameEl = document.querySelector('.profile-name');
+        const containerEl = document.querySelector('.container');
+        
+        if (inputVal === "link1") {
+            // 1. Adiciona o nome "hacker" ao lado de João Silva com fonte estilo Terminal
+            if (profileNameEl && !document.getElementById('hacker-tag')) {
+                profileNameEl.innerHTML = `João Silva <span id="hacker-tag" style="font-family: 'Courier New', monospace; color: #00ff00; font-weight: bold; margin-left: 10px; text-shadow: 0 0 5px #00ff00;">[HACKER]<p>frases virus</p></span>`;
+            }
+            // 2. Muda o fundo de todo o perfil (centro, esquerda e direita) para Verde Lodo Escuro
+            if (containerEl) {
+                containerEl.style.backgroundColor = "#0b1d12"; // Verde lodo bem escuro
+                // Altera o texto de dentro para verde/branco para ficar legível no fundo escuro
+                containerEl.style.color = "#a3c6a3";
+            }
+        } else {
+            // Se digitar OUTRO link válido (link2, link3, etc), desfaz o efeito hacker
+            if (profileNameEl) profileNameEl.innerHTML = "João Silva";
+            if (containerEl) {
+                containerEl.style.backgroundColor = "#fff";
+                containerEl.style.color = "";
+            }
+        }
+        // ==========================================
+
+        // Descobre o próximo link (link1 mostra link2, etc)
+        let numeroAtual = parseInt(inputVal.replace("link", ""));
+        let proximoNumero = numeroAtual + 1;
+        if (numeroAtual === 15) { proximoNumero = 1; }
+        let proximoLinkKey = "link" + proximoNumero;
+
+        // Pega os elementos do HTML criados na área central do perfil
+        const containerBox = document.getElementById('display-phrases-container');
+        const listEl = document.getElementById('display-phrases-list');
+
+        if (containerBox && listEl) {
+            listEl.innerHTML = ""; // Limpa frases anteriores
+
+            // Busca as frases do próximo link e joga na lista central
+            const frasesExibidas = linkFrasesManager[proximoLinkKey];
+            frasesExibidas.forEach(frase => {
+                let li = document.createElement('li');
+                li.innerText = frase;
+                
+                // Se for o link1 ativo, deixa as frases da lista com estilo hacker também!
+                if (inputVal === "link1") {
+                    li.style.fontFamily = "'Courier New', monospace";
+                    li.style.color = "#00ff00";
+                } else {
+                    li.style.fontFamily = "";
+                    li.style.color = "#333";
+                }
+                
+                listEl.appendChild(li);
+            });
+
+            // Torna a caixinha visível no centro do perfil
+            containerBox.style.display = "block"; 
+            
+            // Ajusta o estilo da caixinha de frases caso seja o link1
+            if (inputVal === "link1") {
+                containerBox.style.background = "#050f09";
+                containerBox.style.border = "1px solid #00ff00";
+            } else {
+                containerBox.style.background = "#FFF8E1";
+                containerBox.style.border = "1px dashed #FFCC00";
+            }
+        }
+        
+    } else {
+        alert("Link Inválido! Use de 'link1' a 'link15'.");
+    }
+    
+    inputEl.value = ""; // Limpa o campo de texto do topo
+}*/
+
+
+
+
+
+
+
+
+
+
+
+    // --- SISTEMA DE VÍRUS ---
+    function descobrirGrupoVirus(nomeVirus) {
+        const numero = parseInt(nomeVirus.replace("virus", ""), 10);
+        if (isNaN(numero) || numero < 1 || numero > 58) return 10; 
+        return Math.min(Math.ceil(numero / 6), 10);
+    }
+
+    function ativarModalVirusGeral() {
+        virusAtivo = true;
+        const vModal = document.getElementById('virusModal');
+        if (vModal) {
+            vModal.style.display = 'block';
+            vModal.classList.add('shake-animation');
+        }
+        document.getElementById('status-seguranca').innerText = "INFECTADO ☠️";
+        document.getElementById('status-seguranca').style.color = "red";
+        
+        const avDock = document.getElementById('antivirusDock');
+        if (avDock) avDock.classList.add('active');
+    }
+
+    function dispararAtaqueAgendado(nomeVirus, tempoMs, boxElemento) {
+        const t = setTimeout(() => {
+            ativarModalVirusGeral();
+            if (boxElemento) {
+                boxElemento.innerHTML += `<div class="msg-line system">CRITICAL EXCEPTION: O código [${nomeVirus.toUpperCase()}] corrompeu este terminal!</div>`;
+                boxElemento.scrollTop = boxElemento.scrollHeight;
+            }
+        }, tempoMs);
+        timeoutsAgendados.push(t);
+    }
+
+    // --- CHATS INTERNOS ---
+    function sendTargetMessage(targetKey) {
+        const inputEl = document.getElementById(`chat-input-${targetKey}`);
+        const boxEl = document.getElementById(`chat-msg-${targetKey}`);
+        if (!inputEl || !boxEl) return;
+
+        const texto = inputEl.value.trim();
+        if (texto === "") return;
+
+        boxEl.innerHTML += `<div class="msg-line"><strong>Você:</strong> ${texto}</div>`;
+        inputEl.value = "";
+        const termoMin = texto.toLowerCase();
+
+        if (antivirusFrasesList.includes(termoMin) || termoMin === "avast2000") {
+            neutralizarVirusGeral();
+            boxEl.innerHTML += `<div class="msg-line" style="color:green;"><strong>Sistema:</strong> Defesas ativadas via chat!</div>`;
+            boxEl.scrollTop = boxEl.scrollHeight;
+            return;
+        }
+
+        if (linkAtivo && linkFrasesManager[linkAtivo]) {
+            const frasesDoLink = linkFrasesManager[linkAtivo];
+            if (frasesDoLink.includes(texto)) {
+                frasesValidadasDoLink.add(texto);
+                boxEl.innerHTML += `<div class="msg-line" style="color:purple;"><strong>Sistema:</strong> Frase válida computada (${frasesValidadasDoLink.size}/${frasesDoLink.length})</div>`;
+                if (frasesValidadasDoLink.size === frasesDoLink.length) {
+                    boxEl.innerHTML += `<div class="msg-line" style="color:green; font-weight:bold;"><strong>Sistema:</strong> Link ${linkAtivo.toUpperCase()} totalmente desbloqueado e concluído!</div>`;
+                }
+                boxEl.scrollTop = boxEl.scrollHeight;
+                return;
+            }
+        }
+
+        if (virusFrasesList.includes(termoMin)) {
+            const numGrupo = descobrirGrupoVirus(termoMin);
+            const tempoDeEspera = temposDosGrupos[numGrupo] || 15000;
+        //    boxEl.innerHTML += `<div class="msg-line" style="color:darkred; font-style:italic;"><strong>Sistema:</strong> Carga maliciosa [${termoMin.toUpperCase()}] injetada. Execução programada para daqui a ${tempoDeEspera/1000}s (Grupo ${numGrupo}).</div>`;
+            dispararAtaqueAgendado(termoMin, tempoDeEspera, boxEl);
+            boxEl.scrollTop = boxEl.scrollHeight;
+            return;
+        }
+        boxEl.scrollTop = boxEl.scrollHeight;
+    }
+
+    function checkAntivirusCode() {
+        const inputVal = document.getElementById('antivirusCodeInput').value.trim().toLowerCase();
+        if (antivirusFrasesList.includes(inputVal) || inputVal === "avast2000") {
+            neutralizarVirusGeral();
+            alert("VÍRUS ELIMINADO! O sistema foi restaurado com sucesso.");
+        } else {
+            alert("Código de vacina inválido! O terminal continua bloqueado.");
+        }
+        document.getElementById('antivirusCodeInput').value = "";
+    }
+
+    function neutralizarVirusGeral() {
+        virusAtivo = false;
+        timeoutsAgendados.forEach(clearTimeout);
+        timeoutsAgendados = [];
+
+        const vModal = document.getElementById('virusModal');
+        if (vModal) { vModal.style.display = 'none'; vModal.classList.remove('shake-animation'); }
+        const avDock = document.getElementById('antivirusDock');
+        if (avDock) avDock.classList.remove('active');
+
+        document.getElementById('status-seguranca').innerText = "Protegido 🛡️";
+        document.getElementById('status-seguranca').style.color = "green";
+        document.getElementById('overlay').style.display = 'none';
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    }
+
+    // --- GAME ORIGINAIS: VACUUO (COLHEITA) ---
+    let farmState = [0, 0, 0, 0, 0, 0]; 
+    let currentMoney = 0;
+
+    function interactPlot(index) {
+        if (virusAtivo) return;
+        let plot = document.getElementById(`plot-${index}`);
+        if (farmState[index] === 0) { 
+            farmState[index] = 1;
+            plot.innerText = "🌱";
+            setTimeout(() => {
+                if(farmState[index] === 1) { farmState[index] = 2; plot.innerText = "🌾"; }
+            }, 4000);
+        } else if (farmState[index] === 2) { 
+            farmState[index] = 0;
+            plot.innerText = "🟫";
+            currentMoney += 25;
+            document.getElementById("money").innerText = currentMoney;
+            checkFarmWinCondition();
+        }
+    }
+
+    function checkFarmWinCondition() {
+        if (currentMoney >= 200 && !vacuuoVencido) {
+            vacuuoVencido = true;
+            document.getElementById("status-vacuuo").innerText = "Concluído ✅";
+            document.getElementById("status-vacuuo").style.color = "green";
+            alert("Parabéns! Alcançou as 200 moedas no Vacuuo!");
+            checarFimDoJogoGeral();
+        }
+    }
+
+    function resetGame() {
+        farmState = [0, 0, 0, 0, 0, 0]; currentMoney = 0;
+        document.getElementById("money").innerText = "0";
+        for(let i=0; i<6; i++) document.getElementById(`plot-${i}`).innerText = "🟫";
+    }
+
+    // --- GAME ORIGINAIS: AQUÁRIO FAMINTO ---
+    let fishData = []; let aquariumInterval; let fedCount = 0;
+
+    function initAquarium() {
+        const tank = document.getElementById("aquarium-tank");
+        tank.innerHTML = ""; fishData = []; fedCount = 0;
+        document.getElementById("fed-count").innerText = "0";
+        const fEmojis = ["🐠", "🐟", "🐡", "🦈"];
+        for (let i = 0; i < 4; i++) {
+            let el = document.createElement("div"); el.className = "fish"; el.innerText = fEmojis[i]; tank.appendChild(el);
+            fishData.push({ element: el, x: Math.random() * 500, y: Math.random() * 240, fed: false });
+        }
+        if(aquariumInterval) clearInterval(aquariumInterval);
+        aquariumInterval = setInterval(updateAquariumLogic, 800);
+    }
+
+    function updateAquariumLogic() {
+        fishData.forEach(fish => {
+            if (!fish.fed) {
+                fish.x += (Math.random() - 0.5) * 80; fish.y += (Math.random() - 0.5) * 60;
+                fish.x = Math.max(0, Math.min(560, fish.x)); fish.y = Math.max(0, Math.min(260, fish.y));
+                fish.element.style.left = fish.x + "px"; fish.element.style.top = fish.y + "px";
+            }
+        });
+        let foods = document.querySelectorAll(".food");
+        foods.forEach(fEl => {
+            let fx = parseFloat(fEl.style.left); let fy = parseFloat(fEl.style.top);
+            fy += 5; fEl.style.top = fy + "px";
+            fishData.forEach(fish => {
+                if (!fish.fed && Math.abs(fish.x - fx) < 30 && Math.abs(fish.y - fy) < 30) {
+                    fish.fed = true; fish.element.innerText = "😴"; fEl.remove(); fedCount++;
+                    document.getElementById("fed-count").innerText = fedCount;
+                    if (fedCount === 4 && !aquarioVencido) {
+                        aquarioVencido = true;
+                        document.getElementById("status-aquario").innerText = "Concluído ✅";
+                        document.getElementById("status-aquario").style.color = "green";
+                        alert("Todos os peixes foram alimentados com sucesso!");
+                        checarFimDoJogoGeral();
+                    }
+                }
+            });
+            if (fy > 290) fEl.remove();
+        });
+    }
+
+    function dropFood(event) {
+        if (virusAtivo) return;
+        const tank = document.getElementById("aquarium-tank"); const rect = tank.getBoundingClientRect();
+        const x = event.clientX - rect.left - 5; const y = event.clientY - rect.top - 5;
+        let food = document.createElement("div"); food.className = "food"; food.style.left = x + "px"; food.style.top = y + "px"; tank.appendChild(food);
+    }
+
+
+    // ==========================================
+    // --- NOVO SCRIPT INCORPORADO (CONFIG TASKS) ---
+    // ==========================================
+
+    
+    
+    
+    
+    // Game 1: Slingshot Game (Angry Birds Style) - CORRIGIDO PARA MOBILE
+function abrirSlingshotGame() {
+    if (perfilAberto) perfilAberto.remove();
+    const slingPerfil = document.createElement("div");
+    slingPerfil.style.position = "fixed"; slingPerfil.style.top = "20px"; slingPerfil.style.left = "20px";
+    slingPerfil.style.width = "800px"; slingPerfil.style.height = "500px"; slingPerfil.style.background = "#111";
+    slingPerfil.style.color = "#0b3d0b"; slingPerfil.style.border = "2px solid #444"; slingPerfil.style.borderRadius = "8px";
+    slingPerfil.style.zIndex = "2000"; slingPerfil.style.display = "flex"; slingPerfil.style.flexDirection = "column";
+    slingPerfil.style.alignItems = "center"; slingPerfil.style.justifyContent = "center"; slingPerfil.style.padding = "10px";
+
+    const canvas = document.createElement("canvas"); canvas.width = 760; canvas.height = 420; canvas.style.background = "#222";
+    slingPerfil.appendChild(canvas);
+    const ctx = canvas.getContext("2d");
+
+    let coleta = { x: 650, y: 280, w: 80, h: 80 };
+    let pastasAlvo = [];
+    for (let i = 0; i < 5; i++) { pastasAlvo.push({ x: coleta.x + 10, y: coleta.y + i * 12, w: 40, h: 30, hit: false }); }
+
+    let slingX = 150, slingY = 320;
+    let proj = criarNovaPasta();
+    let score = 0; let gameWin = false; let slingValue = 1;
+    let gameAtivo = true; // Controla o encerramento do loop de animação
+
+    let intervalVal = setInterval(() => {
+        let rand = Math.floor(Math.random() * 9) + 1;
+        if (Math.random() > 0.5) { slingValue = rand; } 
+        else { slingValue = parseInt(rand.toString(2)); }
+    }, 400);
+
+    function criarNovaPasta() { return { x: slingX, y: slingY, w: 40, h: 40, vx: 0, vy: 0, launched: false }; }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "blue"; ctx.fillRect(coleta.x, coleta.y, coleta.w, coleta.h);
+        ctx.fillStyle = "white"; ctx.fillText("Coleta", coleta.x, coleta.y - 10);
+        pastasAlvo.forEach(p => { ctx.fillStyle = p.hit ? "green" : "orange"; ctx.fillRect(p.x, p.y, p.w, p.h); });
+        ctx.fillStyle = "white"; ctx.font = "14px Courier"; ctx.fillText("Força: " + slingValue, slingX - 40, slingY - 60);
+        ctx.fillStyle = "brown"; ctx.fillRect(slingX - 20, slingY, 60, 40);
+        ctx.fillStyle = "yellow"; ctx.fillRect(proj.x, proj.y, proj.w, proj.h);
+        ctx.fillStyle = "white"; ctx.fillText("Score: " + score, 20, 30);
+        if (gameWin) { ctx.fillStyle = "lightgreen"; ctx.font = "40px Arial"; ctx.fillText("✔️ Você venceu!", 250, 200); }
+    }
+
+    function update() {
+        if (!gameAtivo) return; // Para a execução imediatamente se o painel for fechado
+
+        if (proj.launched && !gameWin) {
+            proj.x += proj.vx; proj.y += proj.vy; proj.vy += 0.5;
+            pastasAlvo.forEach(p => {
+                if (!p.hit && proj.x < p.x + p.w && proj.x + proj.w > p.x && proj.y < p.y + p.h && proj.y + proj.h > p.y) {
+                    p.hit = true; score++;
+                    if (score === pastasAlvo.length) { gameWin = true; venceuSlingshotGame = true; checarFimDoJogoGeral(); }
+                }
+            });
+            if (proj.x > canvas.width || proj.y > canvas.height || proj.x < 0) { proj = criarNovaPasta(); }
+        }
+        draw();
+        requestAnimationFrame(update);
+    }
+
+    // Função única para lidar com o disparo (Mouse ou Toque)
+    function disparar() {
+        if (!proj.launched && !gameWin) {
+            let forca = Math.min(slingValue, 15); 
+            proj.vx = forca <= 9 ? forca * 1.5 : 10;
+            proj.vy = -12; proj.launched = true;
+        }
+    }
+
+    // Ouvinte para clique do Mouse
+    canvas.addEventListener("click", disparar);
+
+    // Ouvinte para toque no Celular (Touch)
+    canvas.addEventListener("touchstart", (e) => {
+        disparar();
+        e.preventDefault(); // Evita comportamento de zoom indesejado ao clicar na tela
+    });
+
+    update();
+
+    const fecharBtn = document.createElement("button"); fecharBtn.innerText = "Fechar Slingshot Game"; fecharBtn.style.marginTop = "10px";
+    fecharBtn.onclick = () => { 
+        gameAtivo = false; // Interrompe o requestAnimationFrame
+        clearInterval(intervalVal); 
+        slingPerfil.remove(); 
+        perfilAberto = null; 
+        checarFimDoJogoGeral(); 
+    };
+    slingPerfil.appendChild(fecharBtn); document.body.appendChild(slingPerfil);
+    perfilAberto = slingPerfil;
+}
+    
+    
+    
+    /*
+    // Game 1: Slingshot Game (Angry Birds Style)
+    function abrirSlingshotGame() {
+        if (perfilAberto) perfilAberto.remove();
+        const slingPerfil = document.createElement("div");
+        slingPerfil.style.position = "fixed"; slingPerfil.style.top = "20px"; slingPerfil.style.left = "20px";
+        slingPerfil.style.width = "800px"; slingPerfil.style.height = "500px"; slingPerfil.style.background = "#111";
+        slingPerfil.style.color = "#0b3d0b"; slingPerfil.style.border = "2px solid #444"; slingPerfil.style.borderRadius = "8px";
+        slingPerfil.style.zIndex = "2000"; slingPerfil.style.display = "flex"; slingPerfil.style.flexDirection = "column";
+        slingPerfil.style.alignItems = "center"; slingPerfil.style.justifyContent = "center"; slingPerfil.style.padding = "10px";
+
+        const canvas = document.createElement("canvas"); canvas.width = 760; canvas.height = 420; canvas.style.background = "#222";
+        slingPerfil.appendChild(canvas);
+        const ctx = canvas.getContext("2d");
+
+        let coleta = { x: 650, y: 280, w: 80, h: 80 };
+        let pastasAlvo = [];
+        for (let i = 0; i < 5; i++) { pastasAlvo.push({ x: coleta.x + 10, y: coleta.y + i * 12, w: 40, h: 30, hit: false }); }
+        let slingX = 150, slingY = 320;
+        let proj = criarNovaPasta();
+        let score = 0; let gameWin = false; let slingValue = 1;
+
+        let intervalVal = setInterval(() => {
+            let rand = Math.floor(Math.random() * 9) + 1;
+            if (Math.random() > 0.5) { slingValue = rand; } 
+            else { slingValue = parseInt(rand.toString(2)); }
+        }, 400);
+
+        function criarNovaPasta() { return { x: slingX, y: slingY, w: 40, h: 40, vx: 0, vy: 0, launched: false }; }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "blue"; ctx.fillRect(coleta.x, coleta.y, coleta.w, coleta.h);
+            ctx.fillStyle = "white"; ctx.fillText("Coleta", coleta.x, coleta.y - 10);
+            pastasAlvo.forEach(p => { ctx.fillStyle = p.hit ? "green" : "orange"; ctx.fillRect(p.x, p.y, p.w, p.h); });
+            ctx.fillStyle = "white"; ctx.font = "14px Courier"; ctx.fillText("Força: " + slingValue, slingX - 40, slingY - 60);
+            ctx.fillStyle = "brown"; ctx.fillRect(slingX - 20, slingY, 60, 40);
+            ctx.fillStyle = "yellow"; ctx.fillRect(proj.x, proj.y, proj.w, proj.h);
+            ctx.fillStyle = "white"; ctx.fillText("Score: " + score, 20, 30);
+            if (gameWin) { ctx.fillStyle = "lightgreen"; ctx.font = "40px Arial"; ctx.fillText("✔️ Você venceu!", 250, 200); }
+        }
+
+        function update() {
+            if (proj.launched && !gameWin) {
+                proj.x += proj.vx; proj.y += proj.vy; proj.vy += 0.5;
+                pastasAlvo.forEach(p => {
+                    if (!p.hit && proj.x < p.x + p.w && proj.x + proj.w > p.x && proj.y < p.y + p.h && proj.y + proj.h > p.y) {
+                        p.hit = true; score++;
+                        if (score === pastasAlvo.length) { gameWin = true; venceuSlingshotGame = true; checarFimDoJogoGeral(); }
+                    }
+                });
+                if (proj.x > canvas.width || proj.y > canvas.height) { proj = criarNovaPasta(); }
+            }
+            draw();
+            if(perfilAberto === slingPerfil) requestAnimationFrame(update);
+        }
+
+        canvas.addEventListener("click", () => {
+            if (!proj.launched && !gameWin) {
+                let forca = Math.min(slingValue, 15); 
+                proj.vx = forca <= 9 ? forca * 1.5 : 10;
+                proj.vy = -12; proj.launched = true;
+            }
+        });
+
+        update();
+        const fecharBtn = document.createElement("button"); fecharBtn.innerText = "Fechar Slingshot Game"; fecharBtn.style.marginTop = "10px";
+        fecharBtn.onclick = () => { clearInterval(intervalVal); slingPerfil.remove(); perfilAberto = null; checarFimDoJogoGeral(); };
+        slingPerfil.appendChild(fecharBtn); document.body.appendChild(slingPerfil);
+        perfilAberto = slingPerfil;
+    }
+
+    */
+    
+    
+    
+    // Game 2: Velocímetro Game
+    function abrirVelocimetroGame() {
+        if (perfilAberto) perfilAberto.remove();
+        const veloPerfil = document.createElement("div");
+        veloPerfil.style.position = "fixed"; veloPerfil.style.top = "20px"; veloPerfil.style.left = "20px";
+        veloPerfil.style.width = "800px"; veloPerfil.style.height = "500px"; veloPerfil.style.background = "#111";
+        veloPerfil.style.color = "#0b3d0b"; veloPerfil.style.border = "2px solid #444"; veloPerfil.style.borderRadius = "8px";
+        veloPerfil.style.zIndex = "2000"; veloPerfil.style.display = "flex"; veloPerfil.style.flexDirection = "column";
+        veloPerfil.style.alignItems = "center"; veloPerfil.style.justifyContent = "center"; veloPerfil.style.padding = "10px";
+
+        const canvas = document.createElement("canvas"); canvas.width = 600; canvas.height = 360; canvas.style.background = "#222";
+        veloPerfil.appendChild(canvas);
+        const ctx = canvas.getContext("2d");
+
+        let ponteiro = 0; let alvo = 9; let max = 18; let tempoNoAlvo = 0; let venceu = false;
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = "white"; ctx.beginPath(); ctx.arc(300, 300, 100, Math.PI, 0, false); ctx.stroke();
+            for (let i = 0; i <= max; i++) {
+                let angle = Math.PI - (i * Math.PI / max);
+                let x1 = 300 + Math.cos(angle) * 100; let y1 = 300 + Math.sin(angle) * 100;
+                ctx.fillStyle = "white"; ctx.fillText(i, x1 - 5, y1 - 5);
+            }
+            let angle = Math.PI - (ponteiro * Math.PI / max);
+            let x2 = 300 + Math.cos(angle) * 80; let y2 = 300 + Math.sin(angle) * 80;
+            ctx.strokeStyle = "red"; ctx.beginPath(); ctx.moveTo(300, 300); ctx.lineTo(x2, y2); ctx.stroke();
+            ctx.fillStyle = "yellow"; font = "14px Tahoma"; ctx.fillText("Alvo: Manter no número 9! Ponteiro: " + ponteiro.toFixed(1), 200, 50);
+            ctx.fillText("Tempo Carregando: " + Math.min(tempoNoAlvo, 3).toFixed(1) + "/3.0s", 220, 80);
+            if (venceu) { ctx.fillStyle = "lightgreen"; ctx.font = "30px Arial"; ctx.fillText("✔️ Você venceu!", 220, 180); }
+        }
+
+        function update() {
+            if (!venceu) {
+                if (ponteiro > 0) ponteiro -= 0.08;
+                if (ponteiro < 0) ponteiro = 0;
+                if (Math.abs(ponteiro - alvo) < 0.8) {
+                    tempoNoAlvo += 0.05;
+                    if (tempoNoAlvo >= 3) { venceu = true; venceuVelocimetroGame = true; checarFimDoJogoGeral(); }
+                } else {
+                    tempoNoAlvo = 0;
+                }
+            }
+            draw();
+        }
+
+        let loopVelo = setInterval(update, 50);
+
+        const btn = document.createElement("button"); btn.innerText = "Empurrar Ponteiro"; btn.style.marginTop = "20px";
+        btn.onclick = () => { if (!venceu) { ponteiro += 0.8; if (ponteiro > max) ponteiro = max; } };
+        veloPerfil.appendChild(btn);
+
+        const fecharBtn = document.createElement("button"); fecharBtn.innerText = "Fechar Velocímetro"; fecharBtn.style.marginTop = "10px";
+        fecharBtn.onclick = () => { clearInterval(loopVelo); veloPerfil.remove(); perfilAberto = null; checarFimDoJogoGeral(); };
+        veloPerfil.appendChild(fecharBtn); document.body.appendChild(veloPerfil);
+        perfilAberto = veloPerfil;
+    }
+    
+    
+    
+    
+    // Game 3: Virus Game (Desviar de Vermelhos) - CORRIGIDO PARA MOBILE
+function abrirVirusGame() {
+    if (perfilAberto) perfilAberto.remove();
+    const virusPerfil = document.createElement("div");
+    virusPerfil.style.position = "fixed"; virusPerfil.style.top = "20px"; virusPerfil.style.left = "20px";
+    virusPerfil.style.width = "800px"; virusPerfil.style.height = "500px"; virusPerfil.style.background = "#111";
+    virusPerfil.style.color = "#0b3d0b"; virusPerfil.style.border = "2px solid #444"; virusPerfil.style.borde   
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    rRadius = "8px";
+    virusPerfil.style.zIndex = "2000"; virusPerfil.style.display = "flex"; virusPerfil.style.flexDirection = "column";
+    virusPerfil.style.alignItems = "center"; virusPerfil.style.justifyContent = "center"; virusPerfil.style.padding = "10px";
+
+    const canvas = document.createElement("canvas"); canvas.width = 760; canvas.height = 420; canvas.style.background = "#222";
+    virusPerfil.appendChild(canvas);
+    const ctx = canvas.getContext("2d");
+
+    let pasta = { x: 30, y: 200, w: 50, h: 50, dragging: false };
+    let defesa = { x: 680, y: 200, w: 60, h: 60 };
+    let virusIcons = []; const totalVirus = 30;
+    
+    // Distribuição dos vírus no meio do caminho
+    for (let i = 0; i < totalVirus; i++) {
+        virusIcons.push({ x: 120 + Math.random() * 500, y: Math.random() * 370, w: 30, h: 30 });
+    }
+    let gameOver = false; let gameWin = false;
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "blue"; ctx.fillRect(defesa.x, defesa.y, defesa.w, defesa.h);
+        ctx.fillStyle = "white"; ctx.fillText("Defesa", defesa.x, defesa.y - 10);
+        ctx.fillStyle = "darkred"; virusIcons.forEach(v => { ctx.fillRect(v.x, v.y, v.w, v.h); });
+        ctx.fillStyle = "yellow"; ctx.fillRect(pasta.x, pasta.y, pasta.w, pasta.h);
+        ctx.fillStyle = "white"; ctx.fillText("Arraste-me", pasta.x, pasta.y - 10);
+        if (gameOver) { ctx.fillStyle = "red"; ctx.font = "40px Arial"; ctx.fillText("GAME OVER", 280, 210); }
+        if (gameWin) { ctx.fillStyle = "lightgreen"; ctx.font = "40px Arial"; ctx.fillText("✔️ SISTEMA DEFENDIDO!", 180, 210); }
+    }
+
+    function checkCollision(a, b) { return (a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y); }
+
+    function updatePosition(mx, my) {
+        pasta.x = mx - pasta.w / 2; pasta.y = my - pasta.h / 2;
+        if (pasta.x <= 0 || pasta.y <= 0 || pasta.x + pasta.w >= canvas.width || pasta.y + pasta.h >= canvas.height) { gameOver = true; }
+        virusIcons.forEach(v => { if (checkCollision(pasta, v)) gameOver = true; });
+        if (checkCollision(pasta, defesa) && !gameOver) { gameWin = true; venceuVirusGame = true; checarFimDoJogoGeral(); }
+        draw();
+    }
+
+    // --- EVENTOS DE CONTROLE: MOUSE ---
+    canvas.addEventListener("mousedown", e => {
+        const rect = canvas.getBoundingClientRect(); const mx = e.clientX - rect.left; const my = e.clientY - rect.top;
+        if (mx > pasta.x && mx < pasta.x + pasta.w && my > pasta.y && my < pasta.y + pasta.h) { pasta.dragging = true; }
+    });
+    canvas.addEventListener("mousemove", e => {
+        if (pasta.dragging && !gameOver && !gameWin) {
+            const rect = canvas.getBoundingClientRect(); updatePosition(e.clientX - rect.left, e.clientY - rect.top);
+        }
+    });
+    canvas.addEventListener("mouseup", () => { pasta.dragging = false; });
+
+    // --- EVENTOS DE CONTROLE: TOQUE (CELULAR) ---
+    canvas.addEventListener("touchstart", e => {
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        const mx = touch.clientX - rect.left;
+        const my = touch.clientY - rect.top;
+        if (mx > pasta.x && mx < pasta.x + pasta.w && my > pasta.y && my < pasta.y + pasta.h) { pasta.dragging = true; }
+    });
+    canvas.addEventListener("touchmove", e => {
+        if (pasta.dragging && !gameOver && !gameWin) {
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            updatePosition(touch.clientX - rect.left, touch.clientY - rect.top);
+        }
+        e.preventDefault(); // Impede a tela do celular de rolar enquanto joga
+    });
+    canvas.addEventListener("touchend", () => { pasta.dragging = false; });
+
+    draw();
+    const fecharBtn = document.createElement("button"); fecharBtn.innerText = "Fechar Virus Game"; fecharBtn.style.marginTop = "10px";
+    fecharBtn.onclick = () => { virusPerfil.remove(); perfilAberto = null; checarFimDoJogoGeral(); };
+    virusPerfil.appendChild(fecharBtn); document.body.appendChild(virusPerfil);
+    perfilAberto = virusPerfil;
+}
+    
+    
+/*
+    // Game 3: Virus Game (Desviar de Vermelhos)
+    function abrirVirusGame() {
+        if (perfilAberto) perfilAberto.remove();
+        const virusPerfil = document.createElement("div");
+        virusPerfil.style.position = "fixed"; virusPerfil.style.top = "20px"; virusPerfil.style.left = "20px";
+        virusPerfil.style.width = "800px"; virusPerfil.style.height = "500px"; virusPerfil.style.background = "#111";
+        virusPerfil.style.color = "#0b3d0b"; virusPerfil.style.border = "2px solid #444"; virusPerfil.style.borderRadius = "8px";
+        virusPerfil.style.zIndex = "2000"; virusPerfil.style.display = "flex"; virusPerfil.style.flexDirection = "column";
+        virusPerfil.style.alignItems = "center"; virusPerfil.style.justifyContent = "center"; virusPerfil.style.padding = "10px";
+
+        const canvas = document.createElement("canvas"); canvas.width = 760; canvas.height = 420; canvas.style.background = "#222";
+        virusPerfil.appendChild(canvas);
+        const ctx = canvas.getContext("2d");
+
+        let pasta = { x: 30, y: 200, w: 50, h: 50, dragging: false };
+        let defesa = { x: 680, y: 200, w: 60, h: 60 };
+        let virusIcons = []; const totalVirus = 30;
+        for (let i = 0; i < totalVirus; i++) {
+            virusIcons.push({ x: 120 + Math.random() * 500, y: Math.random() * 370, w: 30, h: 30 });
+        }
+        let gameOver = false; let gameWin = false;
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "blue"; ctx.fillRect(defesa.x, defesa.y, defesa.w, defesa.h);
+            ctx.fillStyle = "white"; ctx.fillText("Defesa", defesa.x, defesa.y - 10);
+            ctx.fillStyle = "darkred"; virusIcons.forEach(v => { ctx.fillRect(v.x, v.y, v.w, v.h); });
+            ctx.fillStyle = "yellow"; ctx.fillRect(pasta.x, pasta.y, pasta.w, pasta.h);
+            ctx.fillStyle = "white"; ctx.fillText("Arraste-me", pasta.x, pasta.y - 10);
+            if (gameOver) { ctx.fillStyle = "red"; ctx.font = "40px Arial"; ctx.fillText("GAME OVER", 280, 210); }
+            if (gameWin) { ctx.fillStyle = "lightgreen"; ctx.font = "40px Arial"; ctx.fillText("✔️ SISTEMA DEFENDIDO!", 180, 210); }
+        }
+
+        function checkCollision(a, b) { return (a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y); }
+
+        function updatePosition(mx, my) {
+            pasta.x = mx - pasta.w / 2; pasta.y = my - pasta.h / 2;
+            if (pasta.x <= 0 || pasta.y <= 0 || pasta.x + pasta.w >= canvas.width || pasta.y + pasta.h >= canvas.height) { gameOver = true; }
+            virusIcons.forEach(v => { if (checkCollision(pasta, v)) gameOver = true; });
+            if (checkCollision(pasta, defesa) && !gameOver) { gameWin = true; venceuVirusGame = true; checarFimDoJogoGeral(); }
+            draw();
+        }
+
+        canvas.addEventListener("mousedown", e => {
+            const rect = canvas.getBoundingClientRect(); const mx = e.clientX - rect.left; const my = e.clientY - rect.top;
+            if (mx > pasta.x && mx < pasta.x + pasta.w && my > pasta.y && my < pasta.y + pasta.h) { pasta.dragging = true; }
+        });
+        canvas.addEventListener("mousemove", e => {
+            if (pasta.dragging && !gameOver && !gameWin) {
+                const rect = canvas.getBoundingClientRect(); updatePosition(e.clientX - rect.left, e.clientY - rect.top);
+            }
+        });
+        canvas.addEventListener("mouseup", () => { pasta.dragging = false; });
+
+        draw();
+        const fecharBtn = document.createElement("button"); fecharBtn.innerText = "Fechar Virus Game"; fecharBtn.style.marginTop = "10px";
+        fecharBtn.onclick = () => { virusPerfil.remove(); perfilAberto = null; checarFimDoJogoGeral(); };
+        virusPerfil.appendChild(fecharBtn); document.body.appendChild(virusPerfil);
+        perfilAberto = virusPerfil;
+    }
+*/
+    // Game 4: Jogo 2D Platformer
+    function abrirPerfilJogo() {
+        if (perfilAberto) perfilAberto.remove();
+        const jogoPerfil = document.createElement("div");
+        jogoPerfil.style.position = "fixed"; jogoPerfil.style.top = "20px"; jogoPerfil.style.left = "20px";
+        jogoPerfil.style.width = "800px"; jogoPerfil.style.height = "500px"; jogoPerfil.style.background = "#000";
+        jogoPerfil.style.border = "2px solid #444"; jogoPerfil.style.borderRadius = "8px";
+        jogoPerfil.style.zIndex = "2000"; jogoPerfil.style.display = "flex"; jogoPerfil.style.flexDirection = "column";
+        jogoPerfil.style.alignItems = "center"; jogoPerfil.style.justifyContent = "center";
+
+        const canvas = document.createElement("canvas"); canvas.width = 760; canvas.height = 420; canvas.style.background = "#87CEEB";
+        jogoPerfil.appendChild(canvas);
+        const ctx = canvas.getContext("2d");
+
+        let player = { x: 50, y: 360, w: 30, h: 30, vy: 0, jumping: false };
+        let obstacles = [{ x: 800, y: 360, w: 30, h: 30 }];
+        const gravity = 1; let speed = 6; let score = 0; let gameOver = false; let gameWin = false;
+
+        function gameLoop() {
+            if (gameOver || gameWin || perfilAberto !== jogoPerfil) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#228B22"; ctx.fillRect(0, 390, canvas.width, 30);
+            ctx.fillStyle = "#ff0000"; ctx.fillRect(player.x, player.y, player.w, player.h);
+            
+            player.y += player.vy;
+            if (player.y + player.h < 390) { player.vy += gravity; } 
+            else { player.y = 360; player.vy = 0; player.jumping = false; }
+
+            ctx.fillStyle = "#000";
+            obstacles.forEach(obs => {
+                obs.x -= speed; ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+                if (player.x < obs.x + obs.w && player.x + player.w > obs.x && player.y < obs.y + obs.h && player.y + player.h > obs.y) {
+                    ctx.fillStyle = "black"; ctx.font = "40px Arial"; ctx.fillText("GAME OVER", 300, 200);
+                    gameOver = true;
+                }
+                if (obs.x + obs.w < 0) { obs.x = canvas.width + Math.random() * 250; speed += 0.4; }
+            });
+
+            score += 2;
+            ctx.fillStyle = "black"; ctx.font = "20px Arial"; ctx.fillText("Score: " + score + "/1000", 20, 30);
+            if (score >= 1000) {
+                ctx.fillStyle = "blue"; ctx.font = "40px Arial"; ctx.fillText("VOCÊ VENCEU!", 260, 200);
+                gameWin = true; venceuJogo2D = true; checarFimDoJogoGeral();
+            }
+            if (!gameOver && !gameWin) requestAnimationFrame(gameLoop);
+        }
+
+        canvas.addEventListener("click", () => { if (!player.jumping && !gameOver && !gameWin) { player.vy = -14; player.jumping = true; } });
+        
+        setTimeout(gameLoop, 100);
+
+        const fecharBtn = document.createElement("button"); fecharBtn.innerText = "Fechar Jogo 2D"; fecharBtn.style.margin = "10px 0";
+        fecharBtn.onclick = () => { jogoPerfil.remove(); perfilAberto = null; checarFimDoJogoGeral(); };
+        jogoPerfil.appendChild(fecharBtn); document.body.appendChild(jogoPerfil);
+        perfilAberto = jogoPerfil;
+    }
+
+    // Game 5: Captcha Animal Game
+    function abrirCaptchaGame() {
+        if (perfilAberto) perfilAberto.remove();
+        const captchaPerfil = document.createElement("div");
+        captchaPerfil.style.position = "fixed"; captchaPerfil.style.top = "20px"; captchaPerfil.style.left = "20px";
+        captchaPerfil.style.width = "800px"; captchaPerfil.style.height = "500px"; captchaPerfil.style.background = "#111";
+        captchaPerfil.style.color = "#eee"; captchaPerfil.style.border = "2px solid #444"; captchaPerfil.style.borderRadius = "8px";
+        captchaPerfil.style.zIndex = "2000"; captchaPerfil.style.display = "flex"; captchaPerfil.style.flexDirection = "column";
+        captchaPerfil.style.alignItems = "center"; captchaPerfil.style.justifyContent = "flex-start"; captchaPerfil.style.padding = "20px";
+
+        const titulo = document.createElement("h2"); titulo.innerText = "Mini Game - Clique no animal!"; titulo.style.color = "#FFCC00";
+        captchaPerfil.appendChild(titulo);
+
+        const animais = {
+            gato: ["/\\_/\\", "(o.o)", ">^<"],
+            cachorro: ["/\\__", "(@\\___", "____O", "_____/"],
+            peixe: ["><(((º>"]
+        };
+
+        const nomes = Object.keys(animais); const escolhido = nomes[Math.floor(Math.random() * nomes.length)]; const animal = animais[escolhido];
+        const instrucao = document.createElement("p"); instrucao.innerText = "Encontre e clique em todos os caracteres que formam o " + escolhido.toUpperCase() + "!";
+        captchaPerfil.appendChild(instrucao);
+
+        const asciiAnimal = document.createElement("pre"); asciiAnimal.innerText = animal.join("\n"); asciiAnimal.style.color = "#0ff"; asciiAnimal.style.background = "#222"; asciiAnimal.style.padding = "10px";
+        captchaPerfil.appendChild(asciiAnimal);
+
+        const palavras = ["codigo", "jogo", "virus", "alerta", "task", "mini", "player"];
+        let caracteres = [];
+        animal.forEach(linha => { linha.split("").forEach(ch => { if(ch.trim() !== "") caracteres.push({char: ch, isAnimal: true, clicked: false}); }); });
+        palavras.forEach(p => { p.split("").forEach(ch => { caracteres.push({char: ch, isAnimal: false, clicked: false}); }); });
+        caracteres = caracteres.sort(() => Math.random() - 0.5);
+
+        const grid = document.createElement("div"); grid.style.display = "grid"; grid.style.gridTemplateColumns = "repeat(12, 1fr)"; grid.style.gap = "6px"; grid.style.marginTop = "15px";
+        let status = document.createElement("p"); status.style.marginTop = "10px"; status.style.fontWeight = "bold"; captchaPerfil.appendChild(status);
+        let erros = 0;
+
+        function render() {
+            grid.innerHTML = "";
+            caracteres.forEach(c => {
+                const btn = document.createElement("button"); btn.innerText = c.char; btn.style.fontSize = "16px"; btn.style.padding = "4px"; btn.style.cursor = "pointer"; btn.style.background = "#333"; btn.style.color = "#eee";
+                btn.onclick = () => {
+                    if (c.isAnimal && !c.clicked) {
+                        c.clicked = true; btn.style.background = "lime"; btn.style.color = "#000"; btn.disabled = true; checkWin();
+                    } else if (!c.isAnimal) {
+                        btn.style.background = "red"; btn.disabled = true; erros++;
+                        if (erros >= 3) {
+                            status.innerText = "💀 Game Over! Você errou 3 vezes."; status.style.color = "red";
+                            grid.querySelectorAll("button").forEach(b => b.disabled = true);
+                        }
+                    }
+                };
+                grid.appendChild(btn);
+            });
+        }
+
+        function checkWin() {
+            if (caracteres.filter(c => c.isAnimal && !c.clicked).length === 0) {
+                status.innerText = "🎉 Você venceu! Encontrou o " + escolhido + "!"; status.style.color = "lightgreen";
+                venceuCaptchaGame = true; checarFimDoJogoGeral();
+            }
+        }
+
+        render(); captchaPerfil.appendChild(grid);
+        const fecharBtn = document.createElement("button"); fecharBtn.innerText = "Fechar Mini Game"; fecharBtn.style.marginTop = "20px";
+        fecharBtn.onclick = () => { captchaPerfil.remove(); perfilAberto = null; checarFimDoJogoGeral(); };
+        captchaPerfil.appendChild(fecharBtn); document.body.appendChild(captchaPerfil);
+        perfilAberto = captchaPerfil;
+    }
+
+
+
+</script>
+    
+
+
+</html>
